@@ -2,7 +2,6 @@ package ohsnap
 
 import (
 	"testing"
-	"time"
 )
 
 // Arbitrary is an interface for generating random values and shrinking them.
@@ -29,12 +28,8 @@ func DefaultConfig() Config {
 }
 
 // Check runs property-based tests with random values and shrinking.
-func Check[T any](t *testing.T, arb Arbitrary[T], prop Property[T], cfg Config) {
-	if cfg.Seed == 0 {
-		cfg.Seed = time.Now().UnixNano()
-	}
-
-	for i := 0; i < cfg.Iterations; i++ {
+func Check[T any](t *testing.T, iterations int, arb Arbitrary[T], prop Property[T]) {
+	for i := 0; i < iterations; i++ {
 		value := arb.Generate()
 		if !prop(value) {
 			shrunk := shrinkValue(arb, value, prop)
