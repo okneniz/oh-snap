@@ -23,7 +23,7 @@ type Config struct {
 // DefaultConfig returns a default configuration.
 func DefaultConfig() Config {
 	return Config{
-		Iterations: 1000,
+		Iterations: 10000,
 		Seed:       0,
 	}
 }
