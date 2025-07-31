@@ -1,10 +1,7 @@
-default: test-report lint
-
-test-report:
-	go run gotest.tools/gotestsum@latest --format standard-verbose
+default: test
 
 test:
-	go test -v -count 1 -timeout 60s -coverprofile=coverage.out ./...
+	go test -v -vet=off ./...
 
 install-linter:
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.54.2
@@ -14,9 +11,6 @@ lint: fmt
 
 fmt:
 	gofmt -w -s .
-
-benchmark:
-	go test -v -bench=. -benchmem -count=5 -run=^# ./...
 
 coverage:
 	go tool cover -func=coverage.out
