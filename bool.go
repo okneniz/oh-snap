@@ -1,7 +1,7 @@
 package ohsnap
 
 import (
-	"math/rand"
+	"math/rand/v2"
 )
 
 type arbitraryBool struct {

@@ -1,0 +1,33 @@
+package ohsnap
+
+import (
+	"math/rand/v2"
+)
+
+type arbitraryUint32 struct {
+	rand     *rand.Rand
+	from, to uint32
+}
+
+func ArbitraryUint32(rnd *rand.Rand, from, to uint32) Arbitrary[uint32] {
+	return &arbitraryUint32{
+		rand: rnd,
+		from: from,
+		to:   to,
+	}
+}
+
+func (a arbitraryUint32) Generate() uint32 {
+	return a.rand.Uint32N(a.to-a.from) + a.from
+}
+
+func (arbitraryUint32) Shrink(value uint32) []uint32 {
+	var results []uint32
+
+	for value != 0 {
+		value /= 2
+		results = append(results, value)
+	}
+
+	return results
+}

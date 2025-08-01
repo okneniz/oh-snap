@@ -1,7 +1,7 @@
 package ohsnap
 
 import (
-	"math/rand"
+	"math/rand/v2"
 	"testing"
 	"time"
 )
@@ -14,13 +14,13 @@ func TestMap(t *testing.T) {
 	seed := time.Now().UnixNano()
 	t.Logf("seed: %v", seed)
 
-	rnd := rand.New(rand.NewSource(seed))
+	rnd := rand.New(rand.NewPCG(0, uint64(seed)))
 
 	keys := ArbitraryString(rnd, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", 3, 10)
 	values := ArbitraryInt(rnd, 5, 100)
 	arb := ArbitraryMap(rnd, keys, values, 3, 10)
 
-	t.Run("check get / put", func(t *testing.T) {
+	t.Run("check get and put", func(t *testing.T) {
 		Check(t, iterations, arb, func(m map[string]int) bool {
 			var key string
 

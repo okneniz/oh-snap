@@ -1,7 +1,7 @@
 package ohsnap
 
 import (
-	"math/rand"
+	"math/rand/v2"
 	"testing"
 	"time"
 )
@@ -14,7 +14,7 @@ func TestBool(t *testing.T) {
 	seed := time.Now().UnixNano()
 	t.Logf("seed: %v", seed)
 
-	rnd := rand.New(rand.NewSource(seed))
+	rnd := rand.New(rand.NewPCG(0, uint64(seed)))
 
 	t.Run("commutative", func(t *testing.T) {
 		t.Parallel()

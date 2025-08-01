@@ -1,7 +1,7 @@
 package ohsnap
 
 import (
-	"math/rand"
+	"math/rand/v2"
 )
 
 type arbitraryMap[K comparable, V any] struct {
@@ -28,7 +28,7 @@ func ArbitraryMap[K comparable, V any](
 }
 
 func (a *arbitraryMap[K, V]) Generate() map[K]V {
-	size := a.rand.Intn(a.maxSize-a.minSize+1) + int(a.minSize)
+	size := a.rand.IntN(a.maxSize-a.minSize+1) + int(a.minSize)
 	result := make(map[K]V, size)
 
 	for i := 0; i < size; i++ {
@@ -44,7 +44,7 @@ func (a *arbitraryMap[K, V]) Generate() map[K]V {
 	return result
 }
 
-func (m *arbitraryMap[K, V]) Shrink(input map[K]V) []map[K]V {
+func (a *arbitraryMap[K, V]) Shrink(input map[K]V) []map[K]V {
 	var shrunk []map[K]V
 
 	if len(input) > 0 {
@@ -62,7 +62,7 @@ func (m *arbitraryMap[K, V]) Shrink(input map[K]V) []map[K]V {
 	}
 
 	for k, v := range input {
-		for _, smallerV := range m.value.Shrink(v) {
+		for _, smallerV := range a.value.Shrink(v) {
 			newMap := make(map[K]V, len(input))
 			for k2, v2 := range input {
 				newMap[k2] = v2

@@ -1,7 +1,7 @@
 package ohsnap
 
 import (
-	"math/rand"
+	"math/rand/v2"
 	"testing"
 	"time"
 )
@@ -15,7 +15,7 @@ func TestString(t *testing.T) {
 
 	t.Logf("seed: %v", seed)
 
-	rnd := rand.New(rand.NewSource(seed))
+	rnd := rand.New(rand.NewPCG(0, uint64(seed)))
 	arb := ArbitraryString(rnd, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", 3, 10)
 
 	t.Run("concatenation", func(t *testing.T) {

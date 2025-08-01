@@ -1,7 +1,7 @@
 default: test
 
 test:
-	go test -v -vet=off ./...
+	go test -v -count=1 -vet=off ./...
 
 install-linter:
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.54.2

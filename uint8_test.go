@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func TestInt(t *testing.T) {
+func TestUint8(t *testing.T) {
 	t.Parallel()
 
 	const iterations = 100000
@@ -21,12 +21,12 @@ func TestInt(t *testing.T) {
 		t.Parallel()
 
 		arb := Combine(
-			ArbitraryInt(rnd, 0, math.MaxInt),
-			ArbitraryInt(rnd, 0, math.MaxInt),
+			ArbitraryUint8(rnd, 0, math.MaxUint8),
+			ArbitraryUint8(rnd, 0, math.MaxUint8),
 		)
 
 		t.Run("addition", func(t *testing.T) {
-			Check(t, iterations, arb, func(p Pair[int, int]) bool {
+			Check(t, iterations, arb, func(p Pair[uint8, uint8]) bool {
 				a := p.First
 				b := p.Second
 				return a+b == b+a
@@ -34,7 +34,7 @@ func TestInt(t *testing.T) {
 		})
 
 		t.Run("multiplication", func(t *testing.T) {
-			Check(t, iterations, arb, func(p Pair[int, int]) bool {
+			Check(t, iterations, arb, func(p Pair[uint8, uint8]) bool {
 				a := p.First
 				b := p.Second
 				return a*b == b*a
@@ -46,15 +46,15 @@ func TestInt(t *testing.T) {
 		t.Parallel()
 
 		arb := Combine(
-			ArbitraryInt(rnd, 0, math.MaxInt),
+			ArbitraryUint8(rnd, 0, math.MaxUint8),
 			Combine(
-				ArbitraryInt(rnd, 0, math.MaxInt),
-				ArbitraryInt(rnd, 0, math.MaxInt),
+				ArbitraryUint8(rnd, 0, math.MaxUint8),
+				ArbitraryUint8(rnd, 0, math.MaxUint8),
 			),
 		)
 
 		t.Run("addition", func(t *testing.T) {
-			Check(t, iterations, arb, func(p Pair[int, Pair[int, int]]) bool {
+			Check(t, iterations, arb, func(p Pair[uint8, Pair[uint8, uint8]]) bool {
 				a := p.First
 				b := p.Second.First
 				c := p.Second.Second
@@ -63,7 +63,7 @@ func TestInt(t *testing.T) {
 		})
 
 		t.Run("multiplication", func(t *testing.T) {
-			Check(t, iterations, arb, func(p Pair[int, Pair[int, int]]) bool {
+			Check(t, iterations, arb, func(p Pair[uint8, Pair[uint8, uint8]]) bool {
 				a := p.First
 				b := p.Second.First
 				c := p.Second.Second
@@ -74,14 +74,14 @@ func TestInt(t *testing.T) {
 
 	t.Run("distributive", func(t *testing.T) {
 		arb := Combine(
-			ArbitraryInt(rnd, 0, math.MaxInt),
+			ArbitraryUint8(rnd, 0, math.MaxUint8),
 			Combine(
-				ArbitraryInt(rnd, 0, math.MaxInt),
-				ArbitraryInt(rnd, 0, math.MaxInt),
+				ArbitraryUint8(rnd, 0, math.MaxUint8),
+				ArbitraryUint8(rnd, 0, math.MaxUint8),
 			),
 		)
 
-		Check(t, iterations, arb, func(p Pair[int, Pair[int, int]]) bool {
+		Check(t, iterations, arb, func(p Pair[uint8, Pair[uint8, uint8]]) bool {
 			a := p.First
 			b := p.Second.First
 			c := p.Second.Second

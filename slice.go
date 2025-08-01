@@ -1,7 +1,7 @@
 package ohsnap
 
 import (
-	"math/rand"
+	"math/rand/v2"
 )
 
 type arbitrarySlice[T any] struct {
@@ -25,7 +25,7 @@ func ArbitrarySlice[T any](
 }
 
 func (a *arbitrarySlice[T]) Generate() []T {
-	length := a.rand.Intn(a.maxLen-a.minLen+1) + int(a.minLen)
+	length := a.rand.IntN(a.maxLen-a.minLen+1) + int(a.minLen)
 
 	slice := make([]T, length)
 	for i := range slice {
@@ -35,7 +35,7 @@ func (a *arbitrarySlice[T]) Generate() []T {
 	return slice
 }
 
-func (s *arbitrarySlice[T]) Shrink(slice []T) [][]T {
+func (a *arbitrarySlice[T]) Shrink(slice []T) [][]T {
 	var shrunk [][]T
 
 	if len(slice) > 0 {
@@ -44,7 +44,7 @@ func (s *arbitrarySlice[T]) Shrink(slice []T) [][]T {
 	}
 
 	for i := range slice {
-		for _, smallerElem := range s.elem.Shrink(slice[i]) {
+		for _, smallerElem := range a.elem.Shrink(slice[i]) {
 			newSlice := make([]T, len(slice))
 			copy(newSlice, slice)
 			newSlice[i] = smallerElem

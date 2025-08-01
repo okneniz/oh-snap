@@ -1,7 +1,7 @@
 package ohsnap
 
 import (
-	"math/rand"
+	"math/rand/v2"
 )
 
 type stringArbitrary struct {
@@ -20,11 +20,11 @@ func ArbitraryString(rnd *rand.Rand, letters string, from, to int) Arbitrary[str
 }
 
 func (a stringArbitrary) Generate() string {
-	length := a.rand.Intn(a.to-a.from+1) + int(a.from)
+	length := a.rand.IntN(a.to-a.from+1) + int(a.from)
 	result := make([]byte, length)
 
 	for i := range result {
-		result[i] = a.letters[rand.Intn(len(a.letters))]
+		result[i] = a.letters[rand.IntN(len(a.letters))]
 	}
 
 	return string(result)
