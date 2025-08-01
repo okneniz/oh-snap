@@ -1,0 +1,33 @@
+package ohsnap
+
+import (
+	"math/rand/v2"
+)
+
+type arbitraryInt64 struct {
+	rand     *rand.Rand
+	from, to int64
+}
+
+func ArbitraryInt64(rnd *rand.Rand, from, to int64) Arbitrary[int64] {
+	return &arbitraryInt64{
+		rand: rnd,
+		from: from,
+		to:   to,
+	}
+}
+
+func (a arbitraryInt64) Generate() int64 {
+	return a.rand.Int64N(a.to-a.from) + a.from
+}
+
+func (arbitraryInt64) Shrink(value int64) []int64 {
+	var results []int64
+
+	for value != 0 {
+		value /= 2
+		results = append(results, value)
+	}
+
+	return results
+}
