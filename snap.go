@@ -16,14 +16,12 @@ type Property[T any] func(T) bool
 // Config holds configuration for running property-based tests.
 type Config struct {
 	Iterations int
-	Seed       int64
 }
 
 // DefaultConfig returns a default configuration.
 func DefaultConfig() Config {
 	return Config{
 		Iterations: 10000,
-		Seed:       0,
 	}
 }
 
