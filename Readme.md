@@ -1,3 +1,3 @@
 # OhSnap!
 
-Property-base golang testing library.
+Property-based golang testing library.
