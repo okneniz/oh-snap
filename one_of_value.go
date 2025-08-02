@@ -9,9 +9,9 @@ type arbitraryOneOfValue[T any] struct {
 	values []T
 }
 
-func OneOValue[T any](
+func OneOfValue[T any](
 	rnd *rand.Rand,
-	values []T,
+	values ...T,
 ) Arbitrary[T] {
 	return &arbitraryOneOfValue[T]{
 		rand:   rnd,
