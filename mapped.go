@@ -1,20 +1,44 @@
 package ohsnap
 
-// Map transforms a generator of type T into a generator of type U.
-func Map[T, U any](arb Arbitrary[T], f func(T) U) Arbitrary[U] {
-	return &mappedArbitrary[T, U]{arb, f}
+type Mapped[T, U any] struct {
+	Value U
+	raw   T
 }
 
 type mappedArbitrary[T, U any] struct {
-	arb Arbitrary[T]
-	f   func(T) U
+	arbitrary Arbitrary[T]
+	f         func(T) U
 }
 
-func (m *mappedArbitrary[T, U]) Generate() U {
-	return m.f(m.arb.Generate())
+// Map transforms a generator of type T into a generator of type U.
+func Map[T, U any](
+	arb Arbitrary[T],
+	f func(T) U,
+) Arbitrary[Mapped[T, U]] {
+	return &mappedArbitrary[T, U]{
+		arbitrary: arb,
+		f:         f,
+	}
 }
 
-func (m *mappedArbitrary[T, U]) Shrink(value U) []U {
-	// Shrinking is not supported for mapped generators
-	return nil
+func (a *mappedArbitrary[T, U]) Generate() Mapped[T, U] {
+	raw := a.arbitrary.Generate()
+
+	return Mapped[T, U]{
+		Value: a.f(raw),
+		raw:   raw,
+	}
+}
+
+func (a *mappedArbitrary[T, U]) Shrink(m Mapped[T, U]) []Mapped[T, U] {
+	var results []Mapped[T, U]
+
+	for _, x := range a.arbitrary.Shrink(m.raw) {
+		results = append(results, Mapped[T, U]{
+			Value: a.f(x),
+			raw:   x,
+		})
+	}
+
+	return results
 }
