@@ -4,13 +4,17 @@
 
 Property-based golang testing library.
 
-### Installation
+## Installation
 
 ```bash
 go get github.com/okneniz/oh-snap
 ```
 
-## Examples
+## Documentation
+
+[GoDoc documentation](https://pkg.go.dev/github.com/okneniz/oh-snap).
+
+### Examples
 
 - [timestamps parsing](https://github.com/okneniz/parsec/blob/master/examples/strings/timestamps/timestamps_test.go)
 
