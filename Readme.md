@@ -17,6 +17,7 @@ go get github.com/okneniz/oh-snap
 ### Examples
 
 - [timestamps parsing](https://github.com/okneniz/parsec/blob/master/examples/strings/timestamps/timestamps_test.go)
+- [json parsing](https://github.com/okneniz/parsec/blob/master/examples/strings/json/json_test.go)
 
 ## Roadmap
 
