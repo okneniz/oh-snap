@@ -11,6 +11,10 @@ type arbitrarySlice[T any] struct {
 	maxLen int
 }
 
+// ArbitrarySlice - return generator for arbitrary slices.
+// - rnd - pseudo-random number generator.
+// - elem - generator of arbitrary elements of slice.
+// - minLen and maxLen - bounds of length of generated values.
 func ArbitrarySlice[T any](
 	rnd *rand.Rand,
 	elem Arbitrary[T],

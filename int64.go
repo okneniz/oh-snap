@@ -9,6 +9,9 @@ type arbitraryInt64 struct {
 	from, to int64
 }
 
+// ArbitraryInt64 - return generator for arbitrary int64 values.
+// - rnd - pseudo-random number generator.
+// - from and to - bounds of generated values.
 func ArbitraryInt64(rnd *rand.Rand, from, to int64) Arbitrary[int64] {
 	return &arbitraryInt64{
 		rand: rnd,

@@ -9,6 +9,9 @@ type arbitraryInt8 struct {
 	from, to int8
 }
 
+// ArbitraryInt8 - return generator for arbitrary int8 values.
+// - rnd - pseudo-random number generator.
+// - from and to - bounds of generated values.
 func ArbitraryInt8(rnd *rand.Rand, from, to int8) Arbitrary[int8] {
 	return &arbitraryInt8{
 		rand: rnd,

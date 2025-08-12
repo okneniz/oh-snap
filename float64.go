@@ -9,6 +9,9 @@ type arbitraryFloat64 struct {
 	from, to float64
 }
 
+// ArbitraryFloat64 - return generator for arbitrary float64 values.
+// - rnd - pseudo-random number generator.
+// - from and to - bounds of generated values.
 func ArbitraryFloat64(rnd *rand.Rand, from, to float64) Arbitrary[float64] {
 	return &arbitraryFloat64{
 		rand: rnd,

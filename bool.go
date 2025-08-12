@@ -8,8 +8,8 @@ type arbitraryBool struct {
 	rand *rand.Rand
 }
 
-// ArbitraryBool - returns generator for arbitray `bool` values.
-// `rnd` - pseudo-random number generator.
+// ArbitraryBool - returns generator for arbitrary bool values.
+// rnd - pseudo-random number generator.
 func ArbitraryBool(rnd *rand.Rand) Arbitrary[bool] {
 	return &arbitraryBool{
 		rand: rnd,

@@ -9,6 +9,9 @@ type arbitraryFloat32 struct {
 	from, to float32
 }
 
+// ArbitraryFloat32 - return generator for arbitrary float32 values.
+// - rnd - pseudo-random number generator.
+// - from and to - bounds of generated values.
 func ArbitraryFloat32(rnd *rand.Rand, from, to float32) Arbitrary[float32] {
 	return &arbitraryFloat32{
 		rand: rnd,

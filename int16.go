@@ -9,6 +9,9 @@ type arbitraryInt16 struct {
 	from, to int16
 }
 
+// ArbitraryInt16 - return generator for arbitrary int16 values.
+// - rnd - pseudo-random number generator.
+// - from and to - bounds of generated values.
 func ArbitraryInt16(rnd *rand.Rand, from, to int16) Arbitrary[int16] {
 	return &arbitraryInt16{
 		rand: rnd,

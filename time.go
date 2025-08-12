@@ -10,6 +10,9 @@ type arbitraryTime struct {
 	from, to time.Time
 }
 
+// ArbitraryTime - return generator for arbitrary time values.
+// - rnd - pseudo-random number generator.
+// - from and to - bounds of generated values.
 func ArbitraryTime(rnd *rand.Rand, from, to time.Time) Arbitrary[time.Time] {
 	return &arbitraryTime{
 		rand: rnd,

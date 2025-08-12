@@ -9,6 +9,9 @@ type arbitraryUint struct {
 	from, to uint
 }
 
+// ArbitraryUint - return generator for arbitrary uint values.
+// - rnd - pseudo-random number generator.
+// - from and to - bounds of generated values.
 func ArbitraryUint(rnd *rand.Rand, from, to uint) Arbitrary[uint] {
 	return &arbitraryUint{
 		rand: rnd,
