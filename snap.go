@@ -13,18 +13,6 @@ type Arbitrary[T any] interface {
 // Property is a function that takes a value of type T and returns a boolean.
 type Property[T any] func(T) bool
 
-// Config holds configuration for running property-based tests.
-type Config struct {
-	Iterations int
-}
-
-// DefaultConfig returns a default configuration.
-func DefaultConfig() Config {
-	return Config{
-		Iterations: 10000,
-	}
-}
-
 // Check runs property-based tests with random values and shrinking.
 func Check[T any](t *testing.T, iterations int, arb Arbitrary[T], prop Property[T]) {
 	for i := 0; i < iterations; i++ {
