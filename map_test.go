@@ -26,7 +26,7 @@ func TestMap(t *testing.T) {
 
 			lenBefore := len(m)
 
-			for k, _ := range m {
+			for k := range m {
 				key = k
 				break
 			}

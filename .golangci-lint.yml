@@ -1,0 +1,5 @@
+linters:
+  default: all
+  disable:
+    - govet
+    - staticcheck

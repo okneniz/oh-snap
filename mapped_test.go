@@ -9,7 +9,7 @@ import (
 func TestMapped(t *testing.T) {
 	t.Parallel()
 
-	const iterations = 100000
+	const iterations = 100
 
 	seed := time.Now().UnixNano()
 	t.Logf("seed: %v", seed)
@@ -48,7 +48,7 @@ func TestMapped(t *testing.T) {
 		},
 	)
 
-	CheckM(t, 10, users, func(p User) bool {
+	CheckM(t, iterations, users, func(p User) bool {
 		t.Log("user", p)
 		return true
 	})

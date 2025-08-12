@@ -7,7 +7,7 @@ install-linter:
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.54.2
 
 lint: fmt
-	golangci-lint run ./...
+	golangci-lint -c .golangci-lint.yml run ./...
 
 fmt:
 	gofmt -w -s .
@@ -20,4 +20,4 @@ build:
 	go build ./...
 
 pub:
-	GOPROXY=https://proxy.golang.org GO111MODULE=on go get github.com/okneniz/ohsnap
+	GOPROXY=https://proxy.golang.org GO111MODULE=on go get github.com/okneniz/oh-snap
