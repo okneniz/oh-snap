@@ -48,7 +48,7 @@ func TestMapped(t *testing.T) {
 		},
 	)
 
-	CheckM(t, iterations, users, func(p User) bool {
+	Check(t, iterations, users, func(p User) bool {
 		t.Log("user", p)
 		return true
 	})
