@@ -304,8 +304,8 @@ func (b *Builder) Bool() Arbitrary[bool] {
 	return ArbitraryBool(b.rnd)
 }
 
-func (b *Builder) Byte() Arbitrary[int] {
-	return ArbitraryInt(b.rnd, b.minInt, b.maxInt)
+func (b *Builder) Byte() Arbitrary[byte] {
+	return ArbitraryByte(b.rnd, b.minByte, b.maxByte)
 }
 
 func (b *Builder) Rune() Arbitrary[rune] {
@@ -358,7 +358,7 @@ func (b *Builder) BoolSlice() Arbitrary[[]bool] {
 	return ArbitrarySlice(b.rnd, b.Bool(), b.minSliceLen, b.maxSliceLen)
 }
 
-func (b *Builder) ByteSlice() Arbitrary[[]int] {
+func (b *Builder) ByteSlice() Arbitrary[[]byte] {
 	return ArbitrarySlice(b.rnd, b.Byte(), b.minSliceLen, b.maxSliceLen)
 }
 
