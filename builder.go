@@ -229,13 +229,13 @@ func (b *Builder) MaxUint8(x uint8) *Builder {
 
 func (b *Builder) MinUint16(x uint16) *Builder {
 	bb := b.copy()
-	bb.maxUint16 = x
+	bb.minUint16 = x
 	return bb
 }
 
 func (b *Builder) MaxUint16(x uint16) *Builder {
 	bb := b.copy()
-	bb.minUint16 = x
+	bb.maxUint16 = x
 	return bb
 }
 
@@ -253,6 +253,7 @@ func (b *Builder) MaxUint32(x uint32) *Builder {
 
 func (b *Builder) MinUint64(x uint64) *Builder {
 	bb := b.copy()
+	bb.minUint64 = x
 	return bb
 }
 
