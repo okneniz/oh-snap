@@ -406,3 +406,7 @@ func (b *Builder) Uint32Slice() Arbitrary[[]uint32] {
 func (b *Builder) Uint64Slice() Arbitrary[[]uint64] {
 	return ArbitrarySlice(b.rnd, b.Uint64(), b.minSliceLen, b.maxSliceLen)
 }
+
+func (b *Builder) RuneFromTable(tbl *unicode.RangeTable) Arbitrary[rune] {
+	return RuneFromTable(b.rnd, tbl)
+}
