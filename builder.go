@@ -353,6 +353,14 @@ func (b *Builder) Uint64() Arbitrary[uint64] {
 	return ArbitraryUint64(b.rnd, b.minUint64, b.maxUint64)
 }
 
+func (b *Builder) Float32() Arbitrary[float32] {
+	return ArbitraryFloat32(b.rnd, b.minFloat32, b.maxFloat32)
+}
+
+func (b *Builder) Float64() Arbitrary[float64] {
+	return ArbitraryFloat64(b.rnd, b.minFloat64, b.maxFloat64)
+}
+
 // methods to to generate arbitrary slices of primitives
 
 func (b *Builder) BoolSlice() Arbitrary[[]bool] {
