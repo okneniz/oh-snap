@@ -2,7 +2,7 @@
 
 ![Downloads](https://img.shields.io/github/downloads/okneniz/oh-snap/total) ![Contributors](https://img.shields.io/github/contributors/okneniz/oh-snap?color=dark-green) ![Forks](https://img.shields.io/github/forks/okneniz/oh-snap?style=social) ![Stargazers](https://img.shields.io/github/stars/okneniz/oh-snap?style=social) ![Issues](https://img.shields.io/github/issues/okneniz/oh-snap) ![License](https://img.shields.io/github/license/okneniz/oh-snap)
 
-Simplesst property-based golang testing library.
+Simplest property-based golang testing library.
 
 ## Installation
 
