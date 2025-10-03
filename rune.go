@@ -10,8 +10,8 @@ type arbitraryRune struct {
 }
 
 // ArbitraryRune - return generator for arbitrary rune values.
-// - rnd - pseudo-random number generator.
-// - from and to - bounds of generated values.
+// rnd - pseudo-random number generator.
+// from and to - bounds of generated values.
 func ArbitraryRune(rnd *rand.Rand, from, to rune) Arbitrary[rune] {
 	if from > to {
 		from, to = to, from

@@ -10,8 +10,8 @@ type arbitraryOneOfValue[T any] struct {
 }
 
 // OneOfValue - return generator for arbitrary values from list.
-// - rnd - pseudo-random number generator.
-// - values - allowed values.
+// rnd - pseudo-random number generator.
+// values - allowed values.
 func OneOfValue[T any](
 	rnd *rand.Rand,
 	values ...T,

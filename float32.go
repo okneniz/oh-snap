@@ -10,8 +10,8 @@ type arbitraryFloat32 struct {
 }
 
 // ArbitraryFloat32 - return generator for arbitrary float32 values.
-// - rnd - pseudo-random number generator.
-// - from and to - bounds of generated values.
+// rnd - pseudo-random number generator.
+// from and to - bounds of generated values.
 func ArbitraryFloat32(rnd *rand.Rand, from, to float32) Arbitrary[float32] {
 	if from > to {
 		from, to = to, from

@@ -10,8 +10,8 @@ type arbitraryByte struct {
 }
 
 // ArbitraryByte - return generator for arbitrary byte values.
-// - rnd - pseudo-random number generator.
-// - from and to - bounds of generated values.
+// rnd - pseudo-random number generator.
+// from and to - bounds of generated values.
 func ArbitraryByte(rnd *rand.Rand, from, to byte) Arbitrary[byte] {
 	if from > to {
 		from, to = to, from

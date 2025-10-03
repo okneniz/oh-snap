@@ -11,9 +11,9 @@ type stringArbitrary struct {
 }
 
 // ArbitraryString - return generator for arbitrary strings.
-// - rnd - pseudo-random number generator.
-// - letters - string with allowed runes.
-// - from and to - bounds of length of strings.
+// rnd - pseudo-random number generator.
+// letters - string with allowed runes.
+// from and to - bounds of length of strings.
 func ArbitraryString(rnd *rand.Rand, letters string, from, to int) Arbitrary[string] {
 	if from > to {
 		from, to = to, from

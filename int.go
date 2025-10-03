@@ -10,8 +10,8 @@ type arbitraryInt struct {
 }
 
 // ArbitraryInt - return generator for arbitrary int values.
-// - rnd - pseudo-random number generator.
-// - from and to - bounds of generated values.
+// rnd - pseudo-random number generator.
+// from and to - bounds of generated values.
 func ArbitraryInt(rnd *rand.Rand, from, to int) Arbitrary[int] {
 	if from > to {
 		from, to = to, from
