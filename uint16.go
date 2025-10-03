@@ -13,6 +13,10 @@ type arbitraryUint16 struct {
 // - rnd - pseudo-random number generator.
 // - from and to - bounds of generated values.
 func ArbitraryUint16(rnd *rand.Rand, from, to uint16) Arbitrary[uint16] {
+	if from > to {
+		from, to = to, from
+	}
+
 	return &arbitraryUint16{
 		rand: rnd,
 		from: from,

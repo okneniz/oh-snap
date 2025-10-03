@@ -14,6 +14,10 @@ type arbitraryTime struct {
 // - rnd - pseudo-random number generator.
 // - from and to - bounds of generated values.
 func ArbitraryTime(rnd *rand.Rand, from, to time.Time) Arbitrary[time.Time] {
+	if from.After(to) {
+		from, to = to, from
+	}
+
 	return &arbitraryTime{
 		rand: rnd,
 		from: from,

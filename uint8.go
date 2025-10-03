@@ -13,6 +13,10 @@ type arbitraryUint8 struct {
 // - rnd - pseudo-random number generator.
 // - from and to - bounds of generated values.
 func ArbitraryUint8(rnd *rand.Rand, from, to uint8) Arbitrary[uint8] {
+	if from > to {
+		from, to = to, from
+	}
+
 	return &arbitraryUint8{
 		rand: rnd,
 		from: from,

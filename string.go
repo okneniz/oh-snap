@@ -15,6 +15,10 @@ type stringArbitrary struct {
 // - letters - string with allowed runes.
 // - from and to - bounds of length of strings.
 func ArbitraryString(rnd *rand.Rand, letters string, from, to int) Arbitrary[string] {
+	if from > to {
+		from, to = to, from
+	}
+
 	return &stringArbitrary{
 		rand:    rnd,
 		letters: letters,

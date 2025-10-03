@@ -13,6 +13,10 @@ type arbitraryFloat32 struct {
 // - rnd - pseudo-random number generator.
 // - from and to - bounds of generated values.
 func ArbitraryFloat32(rnd *rand.Rand, from, to float32) Arbitrary[float32] {
+	if from > to {
+		from, to = to, from
+	}
+
 	return &arbitraryFloat32{
 		rand: rnd,
 		from: from,
