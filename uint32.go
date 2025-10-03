@@ -21,7 +21,12 @@ func ArbitraryUint32(rnd *rand.Rand, from, to uint32) Arbitrary[uint32] {
 }
 
 func (a arbitraryUint32) Generate() uint32 {
-	return a.rand.Uint32N(a.to-a.from) + a.from
+	x := a.to - a.from
+	if x == 0 {
+		x++
+	}
+
+	return a.rand.Uint32N(x) + a.from
 }
 
 func (arbitraryUint32) Shrink(value uint32) []uint32 {

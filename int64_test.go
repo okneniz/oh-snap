@@ -88,4 +88,19 @@ func TestInt64(t *testing.T) {
 			return a*(b+c) == a*b+a*c
 		})
 	})
+
+	t.Run("same result for single number in range", func(t *testing.T) {
+		for i := int64(0); true; i++ {
+			arb := ArbitraryInt64(rnd, i, i)
+			Check(t, 3, arb, func(x int64) bool { return x == i })
+
+			if i == math.MaxInt16 { // because bounds are too large
+				break
+			}
+		}
+
+		arb := ArbitraryInt64(rnd, math.MaxInt64, math.MaxInt64)
+		Check(t, 3, arb, func(x int64) bool { return x == math.MaxInt64 })
+	})
+
 }

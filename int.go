@@ -21,7 +21,12 @@ func ArbitraryInt(rnd *rand.Rand, from, to int) Arbitrary[int] {
 }
 
 func (a arbitraryInt) Generate() int {
-	return a.rand.IntN(a.to-a.from) + a.from
+	x := a.to - a.from
+	if x == 0 {
+		x++
+	}
+
+	return a.rand.IntN(x) + a.from
 }
 
 func (arbitraryInt) Shrink(value int) []int {

@@ -88,4 +88,15 @@ func TestInt(t *testing.T) {
 			return a*(b+c) == a*b+a*c
 		})
 	})
+
+	t.Run("same result for single number in range", func(t *testing.T) {
+		for i := int(0); i <= math.MaxInt16; i++ {
+			arb := ArbitraryInt(rnd, i, i)
+			Check(t, 3, arb, func(x int) bool { return x == i })
+		}
+
+		arb := ArbitraryInt(rnd, math.MaxInt, math.MaxInt)
+		Check(t, 3, arb, func(x int) bool { return x == math.MaxInt })
+	})
+
 }

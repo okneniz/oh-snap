@@ -21,7 +21,12 @@ func ArbitraryByte(rnd *rand.Rand, from, to byte) Arbitrary[byte] {
 }
 
 func (a arbitraryByte) Generate() byte {
-	return byte(a.rand.UintN(uint(a.to-a.from))) + a.from
+	x := uint(a.to - a.from)
+	if x == 0 {
+		x++
+	}
+
+	return byte(a.rand.UintN(x)) + a.from
 }
 
 func (arbitraryByte) Shrink(value byte) []byte {

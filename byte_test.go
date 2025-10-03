@@ -88,4 +88,15 @@ func TestByte(t *testing.T) {
 			return a*(b+c) == a*b+a*c
 		})
 	})
+
+	t.Run("same result for single number in range", func(t *testing.T) {
+		for i := byte(0); true; i++ {
+			arb := ArbitraryByte(rnd, i, i)
+			Check(t, 10, arb, func(x byte) bool { return x == i })
+
+			if i == math.MaxUint8 {
+				break
+			}
+		}
+	})
 }

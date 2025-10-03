@@ -21,7 +21,12 @@ func ArbitraryUint64(rnd *rand.Rand, from, to uint64) Arbitrary[uint64] {
 }
 
 func (a arbitraryUint64) Generate() uint64 {
-	return a.rand.Uint64N(a.to-a.from) + a.from
+	x := a.to - a.from
+	if x == 0 {
+		x++
+	}
+
+	return a.rand.Uint64N(x) + a.from
 }
 
 func (a arbitraryUint64) Shrink(value uint64) []uint64 {

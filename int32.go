@@ -21,7 +21,12 @@ func ArbitraryInt32(rnd *rand.Rand, from, to int32) Arbitrary[int32] {
 }
 
 func (a arbitraryInt32) Generate() int32 {
-	return a.rand.Int32N(a.to-a.from) + a.from
+	x := a.to - a.from
+	if x == 0 {
+		x++
+	}
+
+	return a.rand.Int32N(x) + a.from
 }
 
 func (arbitraryInt32) Shrink(value int32) []int32 {

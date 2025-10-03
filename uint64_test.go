@@ -88,4 +88,14 @@ func TestUint64(t *testing.T) {
 			return a*(b+c) == a*b+a*c
 		})
 	})
+
+	t.Run("same result for single number in range", func(t *testing.T) {
+		for i := uint64(0); i <= math.MaxInt16; i++ {
+			arb := ArbitraryUint64(rnd, i, i)
+			Check(t, 3, arb, func(x uint64) bool { return x == i })
+		}
+
+		arb := ArbitraryUint64(rnd, math.MaxInt64, math.MaxInt64)
+		Check(t, 3, arb, func(x uint64) bool { return x == math.MaxInt64 })
+	})
 }

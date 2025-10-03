@@ -1,6 +1,7 @@
 package ohsnap
 
 import (
+	"math"
 	"math/rand/v2"
 	"testing"
 	"time"
@@ -87,5 +88,15 @@ func TestRune(t *testing.T) {
 			c := p.Second.Second
 			return a*(b+c) == a*b+a*c
 		})
+	})
+
+	t.Run("same result for single number in range", func(t *testing.T) {
+		for i := int32(0); i <= math.MaxInt16; i++ {
+			arb := ArbitraryRune(rnd, i, i)
+			Check(t, 3, arb, func(x rune) bool { return x == i })
+		}
+
+		arb := ArbitraryRune(rnd, math.MaxInt32, math.MaxInt32)
+		Check(t, 3, arb, func(x rune) bool { return x == math.MaxInt32 })
 	})
 }

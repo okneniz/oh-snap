@@ -21,7 +21,12 @@ func ArbitraryUint16(rnd *rand.Rand, from, to uint16) Arbitrary[uint16] {
 }
 
 func (a arbitraryUint16) Generate() uint16 {
-	return uint16(a.rand.UintN(uint(a.to-a.from))) + a.from
+	x := uint(a.to - a.from)
+	if x == 0 {
+		x++
+	}
+
+	return uint16(a.rand.UintN(x)) + a.from
 }
 
 func (arbitraryUint16) Shrink(value uint16) []uint16 {

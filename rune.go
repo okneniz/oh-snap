@@ -21,7 +21,12 @@ func ArbitraryRune(rnd *rand.Rand, from, to rune) Arbitrary[rune] {
 }
 
 func (a arbitraryRune) Generate() rune {
-	return a.rand.Int32N(a.to-a.from) + a.from
+	x := a.to - a.from
+	if x == 0 {
+		x++
+	}
+
+	return a.rand.Int32N(x) + a.from
 }
 
 func (arbitraryRune) Shrink(value rune) []rune {

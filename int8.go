@@ -21,7 +21,12 @@ func ArbitraryInt8(rnd *rand.Rand, from, to int8) Arbitrary[int8] {
 }
 
 func (a arbitraryInt8) Generate() int8 {
-	return int8(a.rand.IntN(int(a.to-a.from))) + a.from
+	x := int(a.to - a.from)
+	if x == 0 {
+		x++
+	}
+
+	return int8(a.rand.IntN(x)) + a.from
 }
 
 func (arbitraryInt8) Shrink(value int8) []int8 {
