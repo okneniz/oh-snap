@@ -89,15 +89,13 @@ func TestUint16(t *testing.T) {
 		})
 	})
 
-	t.Run("same result for single number in range", func(t *testing.T) {
-		for i := uint16(0); true; i++ {
-			arb := ArbitraryUint16(rnd, i, i)
-			Check(t, 3, arb, func(x uint16) bool { return x == i })
+	t.Run("functional props", func(t *testing.T) {
+		checkBounds(t, rnd, ArbitraryUint16, 0, math.MaxUint16, math.MaxUint16)
 
-			if i == math.MaxUint16 {
-				break
-			}
-		}
+		t.Run("shringking", func(t *testing.T) {
+			checkSrinking(t, ArbitraryUint16(rnd, 0, math.MaxUint16), 1, func(x uint16) bool {
+				return x == 0
+			})
+		})
 	})
-
 }

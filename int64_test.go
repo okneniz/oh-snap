@@ -89,18 +89,13 @@ func TestInt64(t *testing.T) {
 		})
 	})
 
-	t.Run("same result for single number in range", func(t *testing.T) {
-		for i := int64(0); true; i++ {
-			arb := ArbitraryInt64(rnd, i, i)
-			Check(t, 3, arb, func(x int64) bool { return x == i })
+	t.Run("functional props", func(t *testing.T) {
+		checkBounds(t, rnd, ArbitraryInt64, 0, math.MaxInt16*2, math.MaxInt64)
 
-			if i == math.MaxInt16 { // because bounds are too large
-				break
-			}
-		}
-
-		arb := ArbitraryInt64(rnd, math.MaxInt64, math.MaxInt64)
-		Check(t, 3, arb, func(x int64) bool { return x == math.MaxInt64 })
+		t.Run("shringking", func(t *testing.T) {
+			checkSrinking(t, ArbitraryInt64(rnd, 0, math.MaxInt64), 1, func(x int64) bool {
+				return x == 0
+			})
+		})
 	})
-
 }

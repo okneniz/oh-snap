@@ -89,13 +89,13 @@ func TestInt32(t *testing.T) {
 		})
 	})
 
-	t.Run("same result for single number in range", func(t *testing.T) {
-		for i := int32(0); i <= math.MaxInt16; i++ {
-			arb := ArbitraryInt32(rnd, i, i)
-			Check(t, 3, arb, func(x int32) bool { return x == i })
-		}
+	t.Run("functional props", func(t *testing.T) {
+		checkBounds(t, rnd, ArbitraryInt32, 0, math.MaxInt16*2, math.MaxInt32)
 
-		arb := ArbitraryInt32(rnd, math.MaxInt32, math.MaxInt32)
-		Check(t, 3, arb, func(x int32) bool { return x == math.MaxInt32 })
+		t.Run("shringking", func(t *testing.T) {
+			checkSrinking(t, ArbitraryInt32(rnd, 0, math.MaxInt32), 1, func(x int32) bool {
+				return x == 0
+			})
+		})
 	})
 }

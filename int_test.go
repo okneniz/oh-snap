@@ -89,14 +89,13 @@ func TestInt(t *testing.T) {
 		})
 	})
 
-	t.Run("same result for single number in range", func(t *testing.T) {
-		for i := int(0); i <= math.MaxInt16; i++ {
-			arb := ArbitraryInt(rnd, i, i)
-			Check(t, 3, arb, func(x int) bool { return x == i })
-		}
+	t.Run("functional props", func(t *testing.T) {
+		checkBounds(t, rnd, ArbitraryInt, 0, math.MaxInt16*2, math.MaxInt)
 
-		arb := ArbitraryInt(rnd, math.MaxInt, math.MaxInt)
-		Check(t, 3, arb, func(x int) bool { return x == math.MaxInt })
+		t.Run("shringking", func(t *testing.T) {
+			checkSrinking(t, ArbitraryInt(rnd, 0, math.MaxInt), 1, func(x int) bool {
+				return x == 0
+			})
+		})
 	})
-
 }

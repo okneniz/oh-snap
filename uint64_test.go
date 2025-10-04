@@ -89,13 +89,13 @@ func TestUint64(t *testing.T) {
 		})
 	})
 
-	t.Run("same result for single number in range", func(t *testing.T) {
-		for i := uint64(0); i <= math.MaxInt16; i++ {
-			arb := ArbitraryUint64(rnd, i, i)
-			Check(t, 3, arb, func(x uint64) bool { return x == i })
-		}
+	t.Run("functional props", func(t *testing.T) {
+		checkBounds(t, rnd, ArbitraryUint64, 0, math.MaxUint16*2, math.MaxUint64)
 
-		arb := ArbitraryUint64(rnd, math.MaxInt64, math.MaxInt64)
-		Check(t, 3, arb, func(x uint64) bool { return x == math.MaxInt64 })
+		t.Run("shringking", func(t *testing.T) {
+			checkSrinking(t, ArbitraryUint64(rnd, 0, math.MaxUint64), 1, func(x uint64) bool {
+				return x == 0
+			})
+		})
 	})
 }
