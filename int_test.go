@@ -23,7 +23,7 @@ func TestInt(t *testing.T) {
 		checkBounds(t, rnd, ArbitraryInt, 0, math.MaxInt16*2, math.MaxInt)
 
 		t.Run("shringking", func(t *testing.T) {
-			checkSrinking(t, ArbitraryInt(rnd, 0, math.MaxInt), 1, func(x int) bool {
+			checkShrinking(t, ArbitraryInt(rnd, 0, math.MaxInt), 1, func(x int) bool {
 				return x == 0
 			})
 		})

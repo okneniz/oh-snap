@@ -23,7 +23,7 @@ func TestUint8(t *testing.T) {
 		checkBounds(t, rnd, ArbitraryUint8, 0, math.MaxUint8, math.MaxUint8)
 
 		t.Run("shringking", func(t *testing.T) {
-			checkSrinking(t, ArbitraryUint8(rnd, 0, math.MaxUint8), 1, func(x uint8) bool {
+			checkShrinking(t, ArbitraryUint8(rnd, 0, math.MaxUint8), 1, func(x uint8) bool {
 				return x == 0
 			})
 		})

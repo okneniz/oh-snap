@@ -23,7 +23,7 @@ func TestInt64(t *testing.T) {
 		checkBounds(t, rnd, ArbitraryInt64, 0, math.MaxInt16*2, math.MaxInt64)
 
 		t.Run("shringking", func(t *testing.T) {
-			checkSrinking(t, ArbitraryInt64(rnd, 0, math.MaxInt64), 1, func(x int64) bool {
+			checkShrinking(t, ArbitraryInt64(rnd, 0, math.MaxInt64), 1, func(x int64) bool {
 				return x == 0
 			})
 		})

@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func checkSrinking[T comparable](
+func checkShrinking[T comparable](
 	t testing.TB,
 	arb Arbitrary[T],
 	expected T,

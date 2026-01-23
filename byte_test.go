@@ -23,7 +23,7 @@ func TestByte(t *testing.T) {
 		checkBounds(t, rnd, ArbitraryByte, 0, math.MaxUint8, math.MaxUint8)
 
 		t.Run("shringking", func(t *testing.T) {
-			checkSrinking(t, ArbitraryByte(rnd, 0, math.MaxUint8), 1, func(x byte) bool {
+			checkShrinking(t, ArbitraryByte(rnd, 0, math.MaxUint8), 1, func(x byte) bool {
 				return x == 0
 			})
 		})
