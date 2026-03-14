@@ -4,7 +4,7 @@ import (
 	"math/rand/v2"
 )
 
-type stringArbitrary struct {
+type arbitrationString struct {
 	rand     *rand.Rand
 	letters  string
 	from, to int
@@ -19,7 +19,7 @@ func ArbitraryString(rnd *rand.Rand, letters string, from, to int) Arbitrary[str
 		from, to = to, from
 	}
 
-	return &stringArbitrary{
+	return &arbitrationString{
 		rand:    rnd,
 		letters: letters,
 		from:    from,
@@ -27,7 +27,7 @@ func ArbitraryString(rnd *rand.Rand, letters string, from, to int) Arbitrary[str
 	}
 }
 
-func (a stringArbitrary) Generate() string {
+func (a arbitrationString) Generate() string {
 	length := a.rand.IntN(a.to-a.from+1) + int(a.from)
 	result := make([]byte, length)
 
@@ -38,7 +38,7 @@ func (a stringArbitrary) Generate() string {
 	return string(result)
 }
 
-func (stringArbitrary) Shrink(value string) []string {
+func (arbitrationString) Shrink(value string) []string {
 	var results []string
 
 	for len(value) > 0 {
