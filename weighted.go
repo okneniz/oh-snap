@@ -10,10 +10,11 @@ import (
 // the value is the Arbitrary to use for that weight.
 //
 // Example:
-//   arb := Weighted(rnd, map[int]Arbitrary[int]{
-//       1: ArbitraryInt(rnd, 0, 10),
-//       3: ArbitraryInt(rnd, 100, 200),
-//   })
+//
+//	arb := Weighted(rnd, map[int]Arbitrary[int]{
+//	    1: ArbitraryInt(rnd, 0, 10),
+//	    3: ArbitraryInt(rnd, 100, 200),
+//	})
 func Weighted[T any](rnd *rand.Rand, weightedArbs map[int]Arbitrary[T]) Arbitrary[T] {
 	// Flatten map into slices for deterministic iteration order
 	type entry struct {
@@ -33,9 +34,12 @@ func Weighted[T any](rnd *rand.Rand, weightedArbs map[int]Arbitrary[T]) Arbitrar
 	sort.Slice(entries, func(i, j int) bool { return entries[i].weight < entries[j].weight })
 
 	// Convert []entry to []arbitraryWeightedEntry for storage in struct
-	typedEntries := make([]arbitraryWeightedEntry[T], len(entries))
+	typedEntries := make([]*arbitraryWeightedEntry[T], len(entries))
 	for i, e := range entries {
-		typedEntries[i] = arbitraryWeightedEntry[T]{weight: e.weight, arb: e.arb}
+		typedEntries[i] = &arbitraryWeightedEntry[T]{
+			weight: e.weight,
+			arb:    e.arb,
+		}
 	}
 
 	return &arbitraryWeighted[T]{
@@ -52,7 +56,7 @@ type arbitraryWeightedEntry[T any] struct {
 
 type arbitraryWeighted[T any] struct {
 	rand        *rand.Rand
-	entries     []arbitraryWeightedEntry[T]
+	entries     []*arbitraryWeightedEntry[T]
 	totalWeight int
 }
 

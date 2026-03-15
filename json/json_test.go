@@ -31,7 +31,7 @@ func TestEncodingJSON_RoundTrip(t *testing.T) {
 			return false
 		}
 
-		t.Logf("json: %s", string(b))
+		// t.Logf("json: %s", string(b))
 
 		var dst interface{}
 		if err := stdjson.Unmarshal(b, &dst); err != nil {

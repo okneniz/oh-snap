@@ -36,9 +36,9 @@ func TestWeighted_ZeroOrNegativeWeightsAreIgnored(t *testing.T) {
 	rnd := rand.New(rand.NewPCG(1, 2))
 
 	arb := Weighted[int](rnd, map[int]Arbitrary[int]{
-		0: OneOfValue(rnd, 1),
+		0:  OneOfValue(rnd, 1),
 		-2: OneOfValue(rnd, 2),
-		5: OneOfValue(rnd, 42),
+		5:  OneOfValue(rnd, 42),
 	})
 
 	// Only "42" should ever be generated
