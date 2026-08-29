@@ -1,3 +1,15 @@
+// Package json generates arbitrary JSON documents for property-based
+// testing of parsers, serializers and anything else that consumes JSON.
+//
+// A generated [Value] is one of: nil, bool, int64, float64, string,
+// []Value (array) or map[string]Value (object), with nesting depth and
+// collection size bounded by the arguments of [ArbitraryJSON]:
+//
+//	arb := json.ArbitraryJSON(rnd, 4, 6)
+//	ohsnap.Check(t, 1000, arb, func(v json.Value) bool {
+//		data, err := encodingjson.Marshal(v)
+//		return err == nil && encodingjson.Valid(data)
+//	})
 package json
 
 import (
