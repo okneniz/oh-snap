@@ -18,7 +18,7 @@ func TestWithShrinkerStaysInRange(t *testing.T) {
 
 		arb := ArbitraryInt(rnd, 100, 200)
 
-		_, shrunk := findSimplestBadCase(1000, arb, prop)
+		_, shrunk := findSimplestBadCaseWith(1000, arb, prop, traceShrinking(t))
 		if shrunk == nil {
 			t.Fatal("expected property to fail")
 		}
@@ -32,7 +32,7 @@ func TestWithShrinkerStaysInRange(t *testing.T) {
 
 		arb := WithShrinker(ArbitraryInt(rnd, 100, 200), shrink.Halving(100))
 
-		_, shrunk := findSimplestBadCase(1000, arb, prop)
+		_, shrunk := findSimplestBadCaseWith(1000, arb, prop, traceShrinking(t))
 		if shrunk == nil {
 			t.Fatal("expected property to fail")
 		}

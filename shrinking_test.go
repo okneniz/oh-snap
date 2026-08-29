@@ -4,6 +4,15 @@ import (
 	"testing"
 )
 
+// traceShrinking returns options that log every tried shrink candidate
+// via t, making the work of the greedy algorithm visible in test output.
+func traceShrinking(t testing.TB) CheckOptions {
+	return CheckOptions{
+		LogShrinkCandidates: true,
+		Logger:              t,
+	}
+}
+
 func checkShrinking[T comparable](
 	t testing.TB,
 	arb Arbitrary[T],
@@ -12,7 +21,7 @@ func checkShrinking[T comparable](
 ) {
 	t.Helper()
 
-	_, simplestValue := findSimplestBadCase(1000, arb, prop)
+	_, simplestValue := findSimplestBadCaseWith(1000, arb, prop, traceShrinking(t))
 
 	if simplestValue == nil {
 		t.Error("bad value not found")

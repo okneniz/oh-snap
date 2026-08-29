@@ -78,7 +78,7 @@ func TestWeightedDelegatesShrinkToLastPick(t *testing.T) {
 		3: large,
 	})
 
-	value, shrunk := findSimplestBadCase(1000, arb, func(x int) bool { return x == 7 })
+	value, shrunk := findSimplestBadCaseWith(1000, arb, func(x int) bool { return x == 7 }, traceShrinking(t))
 	if value == nil {
 		t.Fatal("expected property to fail")
 	}
