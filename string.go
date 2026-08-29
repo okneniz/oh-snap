@@ -32,7 +32,7 @@ func (a arbitrationString) Generate() string {
 	result := make([]byte, length)
 
 	for i := range result {
-		result[i] = a.letters[rand.IntN(len(a.letters))]
+		result[i] = a.letters[a.rand.IntN(len(a.letters))]
 	}
 
 	return string(result)
