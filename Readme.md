@@ -155,6 +155,11 @@ External examples:
 See the [open issues](https://github.com/okneniz/oh-snap/issues) for a list
 of proposed features (and known issues).
 
+## License
+
+Distributed under the MIT License. See [LICENSE](LICENSE) for more
+information.
+
 ## Contributing
 
 Contributions are what make the open source community such an amazing place
