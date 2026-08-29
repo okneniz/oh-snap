@@ -1,6 +1,7 @@
 package ohsnap
 
 import (
+	"iter"
 	"math/rand/v2"
 )
 
@@ -24,22 +25,29 @@ func ArbitraryByte(rnd *rand.Rand, from, to byte) Arbitrary[byte] {
 	}
 }
 
-func (a arbitraryByte) Generate() byte {
-	x := uint(a.to - a.from)
-	if x == 0 {
-		x++
-	}
+func (a arbitraryByte) Generate() iter.Seq[byte] {
+	return func(yield func(byte) bool) {
+		x := uint(a.to - a.from)
+		if x == 0 {
+			x++
+		}
 
-	return byte(a.rand.UintN(x)) + a.from
+		for {
+			value := byte(a.rand.UintN(x)) + a.from
+			if !yield(value) {
+				return
+			}
+		}
+	}
 }
 
-func (arbitraryByte) Shrink(value byte) []byte {
-	var results []byte
-
-	for value != 0 {
-		value /= 2
-		results = append(results, value)
+func (arbitraryByte) Shrink(value byte) iter.Seq[byte] {
+	return func(yield func(byte) bool) {
+		for value != 0 {
+			value /= 2
+			if !yield(value) {
+				return
+			}
+		}
 	}
-
-	return results
 }

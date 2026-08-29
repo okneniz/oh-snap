@@ -21,7 +21,7 @@ func TestWeighted_Generate_Distribution(t *testing.T) {
 	}
 	const samples = 4000
 	for i := 0; i < samples; i++ {
-		val := arb.Generate()
+		val := First(arb.Generate())
 		counts[val]++
 	}
 
@@ -43,7 +43,7 @@ func TestWeighted_ZeroOrNegativeWeightsAreIgnored(t *testing.T) {
 
 	// Only "42" should ever be generated
 	for i := 0; i < 100; i++ {
-		val := arb.Generate()
+		val := First(arb.Generate())
 		if val != 42 {
 			t.Errorf("Expected only 42, got %v", val)
 		}
@@ -54,13 +54,13 @@ func TestWeighted_EmptyOrAllZeroWeightsReturnsZeroValue(t *testing.T) {
 	rnd := rand.New(rand.NewPCG(3, 4))
 
 	arb := Weighted[int](rnd, map[int]Arbitrary[int]{})
-	val := arb.Generate()
+	val := First(arb.Generate())
 	if val != 0 {
 		t.Errorf("Expected zero value for empty input, got %v", val)
 	}
 
 	arb2 := Weighted[int](rnd, map[int]Arbitrary[int]{0: OneOfValue(rnd, 99)})
-	val2 := arb2.Generate()
+	val2 := First(arb2.Generate())
 	if val2 != 0 {
 		t.Errorf("Expected zero value for all zero weights, got %v", val2)
 	}

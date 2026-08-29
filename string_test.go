@@ -23,15 +23,15 @@ func TestString(t *testing.T) {
 
 		t.Run("associative result", func(t *testing.T) {
 			Check(t, iterations, arb, func(a string) bool {
-				b := arb.Generate()
-				c := arb.Generate()
+				b := First(arb.Generate())
+				c := First(arb.Generate())
 				return (a+b)+c == a+(b+c)
 			})
 		})
 
 		t.Run("associative length of result", func(t *testing.T) {
 			Check(t, iterations, arb, func(a string) bool {
-				b := arb.Generate()
+				b := First(arb.Generate())
 				return len(a+b) == len(a)+len(b)
 			})
 		})

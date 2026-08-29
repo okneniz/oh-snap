@@ -1,6 +1,7 @@
 package ohsnap
 
 import (
+	"iter"
 	"math/rand/v2"
 	"time"
 )
@@ -25,20 +26,28 @@ func ArbitraryTime(rnd *rand.Rand, from, to time.Time) Arbitrary[time.Time] {
 	}
 }
 
-func (a arbitraryTime) Generate() time.Time {
-	n := a.to.UnixNano() - a.from.UnixNano()
-	nanoSeconds := a.rand.Int64N(n)
-	return time.Unix(0, a.from.UnixNano()+nanoSeconds)
+func (a arbitraryTime) Generate() iter.Seq[time.Time] {
+	return func(yield func(time.Time) bool) {
+		n := a.to.UnixNano() - a.from.UnixNano()
+
+		for {
+			nanoSeconds := a.rand.Int64N(n)
+			value := time.Unix(0, a.from.UnixNano()+nanoSeconds)
+			if !yield(value) {
+				return
+			}
+		}
+	}
 }
 
-func (arbitraryTime) Shrink(t time.Time) []time.Time {
-	var results []time.Time
-
-	for value := t.UnixNano(); value != 0; {
-		value /= 2
-		t = time.Unix(0, value)
-		results = append(results, t)
+func (arbitraryTime) Shrink(t time.Time) iter.Seq[time.Time] {
+	return func(yield func(time.Time) bool) {
+		for value := t.UnixNano(); value != 0; {
+			value /= 2
+			shrunk := time.Unix(0, value)
+			if !yield(shrunk) {
+				return
+			}
+		}
 	}
-
-	return results
 }

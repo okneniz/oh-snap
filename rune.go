@@ -1,6 +1,7 @@
 package ohsnap
 
 import (
+	"iter"
 	"math/rand/v2"
 )
 
@@ -24,22 +25,29 @@ func ArbitraryRune(rnd *rand.Rand, from, to rune) Arbitrary[rune] {
 	}
 }
 
-func (a arbitraryRune) Generate() rune {
-	x := a.to - a.from
-	if x == 0 {
-		x++
-	}
+func (a arbitraryRune) Generate() iter.Seq[rune] {
+	return func(yield func(rune) bool) {
+		x := a.to - a.from
+		if x == 0 {
+			x++
+		}
 
-	return a.rand.Int32N(x) + a.from
+		for {
+			value := a.rand.Int32N(x) + a.from
+			if !yield(value) {
+				return
+			}
+		}
+	}
 }
 
-func (arbitraryRune) Shrink(value rune) []rune {
-	var results []rune
-
-	for value != 0 {
-		value /= 2
-		results = append(results, value)
+func (arbitraryRune) Shrink(value rune) iter.Seq[rune] {
+	return func(yield func(rune) bool) {
+		for value != 0 {
+			value /= 2
+			if !yield(value) {
+				return
+			}
+		}
 	}
-
-	return results
 }

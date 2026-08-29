@@ -1,6 +1,7 @@
 package ohsnap
 
 import (
+	"iter"
 	"math/rand/v2"
 )
 
@@ -16,10 +17,17 @@ func ArbitraryBool(rnd *rand.Rand) Arbitrary[bool] {
 	}
 }
 
-func (a arbitraryBool) Generate() bool {
-	return a.rand.Int()%2 == 0
+func (a arbitraryBool) Generate() iter.Seq[bool] {
+	return func(yield func(bool) bool) {
+		for {
+			value := a.rand.Int()%2 == 0
+			if !yield(value) {
+				return
+			}
+		}
+	}
 }
 
-func (arbitraryBool) Shrink(value bool) []bool {
-	return nil
+func (arbitraryBool) Shrink(bool) iter.Seq[bool] {
+	return Empty[bool]()
 }

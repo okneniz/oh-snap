@@ -1,6 +1,7 @@
 package ohsnap
 
 import (
+	"iter"
 	"math/rand/v2"
 )
 
@@ -27,24 +28,31 @@ func ArbitraryString(rnd *rand.Rand, letters string, from, to int) Arbitrary[str
 	}
 }
 
-func (a arbitrationString) Generate() string {
-	length := a.rand.IntN(a.to-a.from+1) + int(a.from)
-	result := make([]byte, length)
+func (a arbitrationString) Generate() iter.Seq[string] {
+	return func(yield func(string) bool) {
+		for {
+			length := a.rand.IntN(a.to-a.from+1) + int(a.from)
+			result := make([]byte, length)
 
-	for i := range result {
-		result[i] = a.letters[a.rand.IntN(len(a.letters))]
+			for i := range result {
+				result[i] = a.letters[a.rand.IntN(len(a.letters))]
+			}
+
+			value := string(result)
+			if !yield(value) {
+				return
+			}
+		}
 	}
-
-	return string(result)
 }
 
-func (arbitrationString) Shrink(value string) []string {
-	var results []string
-
-	for len(value) > 0 {
-		value = value[:len(value)-1] // Remove the last character
-		results = append(results, value)
+func (arbitrationString) Shrink(value string) iter.Seq[string] {
+	return func(yield func(string) bool) {
+		for len(value) > 0 {
+			value = value[:len(value)-1] // Remove the last character
+			if !yield(value) {
+				return
+			}
+		}
 	}
-
-	return results
 }

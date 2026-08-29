@@ -1,6 +1,7 @@
 package ohsnap
 
 import (
+	"iter"
 	"math/rand/v2"
 )
 
@@ -24,17 +25,24 @@ func ArbitraryFloat32(rnd *rand.Rand, from, to float32) Arbitrary[float32] {
 	}
 }
 
-func (a arbitraryFloat32) Generate() float32 {
-	return a.from + a.rand.Float32()*(a.to-a.from)
+func (a arbitraryFloat32) Generate() iter.Seq[float32] {
+	return func(yield func(float32) bool) {
+		for {
+			value := a.from + a.rand.Float32()*(a.to-a.from)
+			if !yield(value) {
+				return
+			}
+		}
+	}
 }
 
-func (arbitraryFloat32) Shrink(value float32) []float32 {
-	var results []float32
-
-	for value != 0 {
-		value /= 2.0
-		results = append(results, value)
+func (arbitraryFloat32) Shrink(value float32) iter.Seq[float32] {
+	return func(yield func(float32) bool) {
+		for value != 0 {
+			value /= 2.0
+			if !yield(value) {
+				return
+			}
+		}
 	}
-
-	return results
 }

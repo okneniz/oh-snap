@@ -1,5 +1,7 @@
 package ohsnap
 
+import "iter"
+
 // Pair represents a pair of values of types T and U.
 type Pair[T, U any] struct {
 	First  T
@@ -16,23 +18,34 @@ type combinedArbitrary[T, U any] struct {
 	arbU Arbitrary[U]
 }
 
-func (c *combinedArbitrary[T, U]) Generate() Pair[T, U] {
-	return Pair[T, U]{
-		First:  c.arbT.Generate(),
-		Second: c.arbU.Generate(),
+func (c *combinedArbitrary[T, U]) Generate() iter.Seq[Pair[T, U]] {
+	return func(yield func(Pair[T, U]) bool) {
+		for {
+			pair := Pair[T, U]{
+				First:  First(c.arbT.Generate()),
+				Second: First(c.arbU.Generate()),
+			}
+			if !yield(pair) {
+				return
+			}
+		}
 	}
 }
 
-func (c *combinedArbitrary[T, U]) Shrink(value Pair[T, U]) []Pair[T, U] {
-	var results []Pair[T, U]
+func (c *combinedArbitrary[T, U]) Shrink(value Pair[T, U]) iter.Seq[Pair[T, U]] {
+	return func(yield func(Pair[T, U]) bool) {
+		for t := range c.arbT.Shrink(value.First) {
+			pair := Pair[T, U]{t, value.Second}
+			if !yield(pair) {
+				return
+			}
+		}
 
-	for _, t := range c.arbT.Shrink(value.First) {
-		results = append(results, Pair[T, U]{t, value.Second})
+		for u := range c.arbU.Shrink(value.Second) {
+			pair := Pair[T, U]{value.First, u}
+			if !yield(pair) {
+				return
+			}
+		}
 	}
-
-	for _, u := range c.arbU.Shrink(value.Second) {
-		results = append(results, Pair[T, U]{value.First, u})
-	}
-
-	return results
 }

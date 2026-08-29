@@ -1,6 +1,7 @@
 package json
 
 import (
+	"iter"
 	"math/rand/v2"
 
 	ohsnap "github.com/okneniz/oh-snap"
@@ -44,11 +45,18 @@ type depthArbitrary struct {
 	depth  int
 }
 
-func (d *depthArbitrary) Generate() Value {
-	return d.parent.generateAt(d.depth)
+func (d *depthArbitrary) Generate() iter.Seq[Value] {
+	return func(yield func(Value) bool) {
+		for {
+			value := d.parent.generateAt(d.depth)
+			if !yield(value) {
+				return
+			}
+		}
+	}
 }
 
-func (d *depthArbitrary) Shrink(v Value) []Value {
+func (d *depthArbitrary) Shrink(v Value) iter.Seq[Value] {
 	return d.parent.Shrink(v)
 }
 
@@ -99,8 +107,15 @@ func ArbitraryJSON(rnd *rand.Rand, maxDepth, maxSize int) ohsnap.Arbitrary[Value
 
 // Generate implements ohsnap.Arbitrary[Value]
 // It uses cached primitive and collection arbitraries.
-func (a *arbitraryJSON) Generate() Value {
-	return a.generateAt(a.maxDepth)
+func (a *arbitraryJSON) Generate() iter.Seq[Value] {
+	return func(yield func(Value) bool) {
+		for {
+			value := a.generateAt(a.maxDepth)
+			if !yield(value) {
+				return
+			}
+		}
+	}
 }
 
 // generateAt generates a JSON Value using remainingDepth to decide whether nesting is allowed.
@@ -109,186 +124,207 @@ func (a *arbitraryJSON) Generate() Value {
 func (a *arbitraryJSON) generateAt(remainingDepth int) Value {
 	// if no nesting allowed or maxSize==0, generate primitives only
 	if remainingDepth <= 0 || a.maxSize == 0 {
-		choice := a.arbChoice.Generate() % 5 // null, bool, float, int, string
+		choice := ohsnap.First(a.arbChoice.Generate()) % 5 // null, bool, float, int, string
 		switch choice {
 		case 0:
 			return nil
 		case 1:
-			return a.arbBool.Generate()
+			return ohsnap.First(a.arbBool.Generate())
 		case 2:
-			return a.arbFloat.Generate()
+			return ohsnap.First(a.arbFloat.Generate())
 		case 3:
-			return a.arbInt.Generate()
+			return ohsnap.First(a.arbInt.Generate())
 		default:
-			return a.arbString.Generate()
+			return ohsnap.First(a.arbString.Generate())
 		}
 	}
 
 	// when nesting allowed, include arrays and objects
-	choice := a.arbChoice.Generate() % 7 // null, bool, float, int, string, array, object
+	choice := ohsnap.First(a.arbChoice.Generate()) % 7 // null, bool, float, int, string, array, object
 	switch choice {
 	case 0:
 		return nil
 	case 1:
-		return a.arbBool.Generate()
+		return ohsnap.First(a.arbBool.Generate())
 	case 2:
-		return a.arbFloat.Generate()
+		return ohsnap.First(a.arbFloat.Generate())
 	case 3:
-		return a.arbInt.Generate()
+		return ohsnap.First(a.arbInt.Generate())
 	case 4:
-		return a.arbString.Generate()
+		return ohsnap.First(a.arbString.Generate())
 	case 5:
-		return a.arbArray.Generate()
+		return ohsnap.First(a.arbArray.Generate())
 	default:
-		return a.arbObject.Generate()
+		return ohsnap.First(a.arbObject.Generate())
 	}
 }
 
 // Shrink delegates to cached arbitraries' Shrink methods and applies structural shrinking
 // for arrays and objects (by converting returned values to []Value).
-func (a *arbitraryJSON) Shrink(v Value) []Value {
-	switch x := v.(type) {
-	case nil:
-		return nil
-	case bool:
-		bs := a.arbBool.Shrink(x)
-		out := make([]Value, 0, len(bs))
-		for _, b := range bs {
-			out = append(out, b)
+func (a *arbitraryJSON) Shrink(v Value) iter.Seq[Value] {
+	return func(yield func(Value) bool) {
+		switch x := v.(type) {
+		case nil:
+			return
+		case bool:
+			for b := range a.arbBool.Shrink(x) {
+				value := Value(b)
+				if !yield(value) {
+					return
+				}
+			}
+		case float64:
+			for f := range a.arbFloat.Shrink(x) {
+				value := Value(f)
+				if !yield(value) {
+					return
+				}
+			}
+		case int64:
+			for i := range a.arbInt.Shrink(x) {
+				value := Value(i)
+				if !yield(value) {
+					return
+				}
+			}
+		case string:
+			for s := range a.arbString.Shrink(x) {
+				value := Value(s)
+				if !yield(value) {
+					return
+				}
+			}
+		case []Value:
+			// ArbitrarySlice.Shrink returns sequence of arrays
+			for arr := range a.arbArray.Shrink(x) {
+				if !yield(arr) {
+					return
+				}
+			}
+			// also include structural shrinks
+			for s := range a.shrinkArray(x) {
+				if !yield(s) {
+					return
+				}
+			}
+		case map[string]Value:
+			for m := range a.arbObject.Shrink(x) {
+				if !yield(m) {
+					return
+				}
+			}
+			for s := range a.shrinkObject(x) {
+				if !yield(s) {
+					return
+				}
+			}
 		}
-		return out
-	case float64:
-		fs := a.arbFloat.Shrink(x)
-		out := make([]Value, 0, len(fs))
-		for _, f := range fs {
-			out = append(out, f)
-		}
-		return out
-	case int64:
-		is := a.arbInt.Shrink(x)
-		out := make([]Value, 0, len(is))
-		for _, i := range is {
-			out = append(out, i)
-		}
-		return out
-	case string:
-		ss := a.arbString.Shrink(x)
-		out := make([]Value, 0, len(ss))
-		for _, s := range ss {
-			out = append(out, s)
-		}
-		return out
-	case []Value:
-		// ArbitrarySlice.Shrink returns [][]T
-		arrs := a.arbArray.Shrink(x)
-		out := make([]Value, 0, len(arrs))
-		for _, arr := range arrs {
-			out = append(out, arr)
-		}
-		// also include structural shrinks
-		out = append(out, a.shrinkArray(x)...)
-		return out
-	case map[string]Value:
-		maps := a.arbObject.Shrink(x)
-		out := make([]Value, 0, len(maps))
-		for _, m := range maps {
-			out = append(out, m)
-		}
-		out = append(out, a.shrinkObject(x)...)
-		return out
-	default:
-		return nil
 	}
 }
 
 // structural shrinking helpers
 
-func (a *arbitraryJSON) shrinkArray(arr []Value) []Value {
-	var shrunk []Value
-	n := len(arr)
-	if n == 0 {
-		return nil
-	}
+func (a *arbitraryJSON) shrinkArray(arr []Value) iter.Seq[Value] {
+	return func(yield func(Value) bool) {
+		n := len(arr)
+		if n == 0 {
+			return
+		}
 
-	// prefix half
-	half := n / 2
-	if half > 0 {
-		prefix := make([]Value, half)
-		copy(prefix, arr[:half])
-		shrunk = append(shrunk, prefix)
-	}
+		// prefix half
+		half := n / 2
+		if half > 0 {
+			prefix := make([]Value, half)
+			copy(prefix, arr[:half])
+			if !yield(prefix) {
+				return
+			}
+		}
 
-	// shrink elements
-	for i := range arr {
-		elemShrinks := a.Shrink(arr[i])
-		for _, s := range elemShrinks {
-			newArr := make([]Value, n)
-			copy(newArr, arr)
-			newArr[i] = s
-			shrunk = append(shrunk, newArr)
+		// shrink elements
+		for i := range arr {
+			for s := range a.Shrink(arr[i]) {
+				newArr := make([]Value, n)
+				copy(newArr, arr)
+				newArr[i] = s
+				if !yield(newArr) {
+					return
+				}
+			}
+		}
+
+		// remove single elements
+		for i := range arr {
+			newArr := make([]Value, 0, n-1)
+			newArr = append(newArr, arr[:i]...)
+			newArr = append(newArr, arr[i+1:]...)
+			if !yield(newArr) {
+				return
+			}
+		}
+
+		// empty
+		empty := []Value{}
+		if !yield(empty) {
+			return
 		}
 	}
-
-	// remove single elements
-	for i := range arr {
-		newArr := make([]Value, 0, n-1)
-		newArr = append(newArr, arr[:i]...)
-		newArr = append(newArr, arr[i+1:]...)
-		shrunk = append(shrunk, newArr)
-	}
-
-	// empty
-	shrunk = append(shrunk, []Value{})
-
-	return shrunk
 }
 
-func (a *arbitraryJSON) shrinkObject(m map[string]Value) []Value {
-	var shrunk []Value
-	if len(m) == 0 {
-		return nil
-	}
+func (a *arbitraryJSON) shrinkObject(m map[string]Value) iter.Seq[Value] {
+	return func(yield func(Value) bool) {
+		if len(m) == 0 {
+			return
+		}
 
-	// produce smaller object with ~half keys
-	halfSize := len(m) / 2
-	if halfSize > 0 {
-		smaller := make(map[string]Value, halfSize)
-		i := 0
+		// produce smaller object with ~half keys
+		halfSize := len(m) / 2
+		if halfSize > 0 {
+			smaller := make(map[string]Value, halfSize)
+			i := 0
+			for k, v := range m {
+				if i >= halfSize {
+					break
+				}
+				smaller[k] = v
+				i++
+			}
+			if !yield(smaller) {
+				return
+			}
+		}
+
+		// shrink individual values
 		for k, v := range m {
-			if i >= halfSize {
-				break
-			}
-			smaller[k] = v
-			i++
-		}
-		shrunk = append(shrunk, smaller)
-	}
-
-	// shrink individual values
-	for k, v := range m {
-		for _, sv := range a.Shrink(v) {
-			newMap := make(map[string]Value, len(m))
-			for k2, v2 := range m {
-				newMap[k2] = v2
-			}
-			newMap[k] = sv
-			shrunk = append(shrunk, newMap)
-		}
-	}
-
-	// remove single keys
-	for k := range m {
-		newMap := make(map[string]Value, len(m)-1)
-		for k2, v := range m {
-			if k2 != k {
-				newMap[k2] = v
+			for sv := range a.Shrink(v) {
+				newMap := make(map[string]Value, len(m))
+				for k2, v2 := range m {
+					newMap[k2] = v2
+				}
+				newMap[k] = sv
+				if !yield(newMap) {
+					return
+				}
 			}
 		}
-		shrunk = append(shrunk, newMap)
+
+		// remove single keys
+		for k := range m {
+			newMap := make(map[string]Value, len(m)-1)
+			for k2, v := range m {
+				if k2 != k {
+					newMap[k2] = v
+				}
+			}
+			if !yield(newMap) {
+				return
+			}
+		}
+
+		// empty object
+		empty := map[string]Value{}
+		if !yield(empty) {
+			return
+		}
 	}
-
-	// empty object
-	shrunk = append(shrunk, map[string]Value{})
-
-	return shrunk
 }

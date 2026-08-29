@@ -1,6 +1,7 @@
 package ohsnap
 
 import (
+	"iter"
 	"math/rand/v2"
 )
 
@@ -24,22 +25,29 @@ func ArbitraryInt64(rnd *rand.Rand, from, to int64) Arbitrary[int64] {
 	}
 }
 
-func (a arbitraryInt64) Generate() int64 {
-	x := a.to - a.from
-	if x == 0 {
-		x++
-	}
+func (a arbitraryInt64) Generate() iter.Seq[int64] {
+	return func(yield func(int64) bool) {
+		x := a.to - a.from
+		if x == 0 {
+			x++
+		}
 
-	return a.rand.Int64N(x) + a.from
+		for {
+			value := a.rand.Int64N(x) + a.from
+			if !yield(value) {
+				return
+			}
+		}
+	}
 }
 
-func (arbitraryInt64) Shrink(value int64) []int64 {
-	var results []int64
-
-	for value != 0 {
-		value /= 2
-		results = append(results, value)
+func (arbitraryInt64) Shrink(value int64) iter.Seq[int64] {
+	return func(yield func(int64) bool) {
+		for value != 0 {
+			value /= 2
+			if !yield(value) {
+				return
+			}
+		}
 	}
-
-	return results
 }

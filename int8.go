@@ -1,6 +1,7 @@
 package ohsnap
 
 import (
+	"iter"
 	"math/rand/v2"
 )
 
@@ -24,22 +25,29 @@ func ArbitraryInt8(rnd *rand.Rand, from, to int8) Arbitrary[int8] {
 	}
 }
 
-func (a arbitraryInt8) Generate() int8 {
-	x := int(a.to - a.from)
-	if x == 0 {
-		x++
-	}
+func (a arbitraryInt8) Generate() iter.Seq[int8] {
+	return func(yield func(int8) bool) {
+		x := int(a.to - a.from)
+		if x == 0 {
+			x++
+		}
 
-	return int8(a.rand.IntN(x)) + a.from
+		for {
+			value := int8(a.rand.IntN(x)) + a.from
+			if !yield(value) {
+				return
+			}
+		}
+	}
 }
 
-func (arbitraryInt8) Shrink(value int8) []int8 {
-	var results []int8
-
-	for value != 0 {
-		value /= 2
-		results = append(results, value)
+func (arbitraryInt8) Shrink(value int8) iter.Seq[int8] {
+	return func(yield func(int8) bool) {
+		for value != 0 {
+			value /= 2
+			if !yield(value) {
+				return
+			}
+		}
 	}
-
-	return results
 }

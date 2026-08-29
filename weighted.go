@@ -1,6 +1,7 @@
 package ohsnap
 
 import (
+	"iter"
 	"math/rand/v2"
 	"sort"
 )
@@ -60,7 +61,18 @@ type arbitraryWeighted[T any] struct {
 	totalWeight int
 }
 
-func (a *arbitraryWeighted[T]) Generate() T {
+func (a *arbitraryWeighted[T]) Generate() iter.Seq[T] {
+	return func(yield func(T) bool) {
+		for {
+			value := a.pick()
+			if !yield(value) {
+				return
+			}
+		}
+	}
+}
+
+func (a *arbitraryWeighted[T]) pick() T {
 	if a.totalWeight == 0 || len(a.entries) == 0 {
 		var zero T
 		return zero
@@ -70,14 +82,14 @@ func (a *arbitraryWeighted[T]) Generate() T {
 	for _, e := range a.entries {
 		acc += e.weight
 		if r < acc {
-			return e.arb.Generate()
+			return First(e.arb.Generate())
 		}
 	}
 	// Fallback (should not happen)
-	return a.entries[len(a.entries)-1].arb.Generate()
+	return First(a.entries[len(a.entries)-1].arb.Generate())
 }
 
-func (a *arbitraryWeighted[T]) Shrink(value T) []T {
+func (a *arbitraryWeighted[T]) Shrink(T) iter.Seq[T] {
 	// No shrinking for weighted combinator by default
-	return nil
+	return Empty[T]()
 }

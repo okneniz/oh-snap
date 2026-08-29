@@ -1,6 +1,7 @@
 package ohsnap
 
 import (
+	"iter"
 	"math/rand/v2"
 )
 
@@ -27,66 +28,78 @@ func ArbitraryMap[K comparable, V any](
 	}
 }
 
-func (a *arbitraryMap[K, V]) Generate() map[K]V {
-	size := a.rand.IntN(a.maxSize-a.minSize+1) + int(a.minSize)
-	result := make(map[K]V, size)
-
-	for i := 0; i < size; i++ {
+func (a *arbitraryMap[K, V]) Generate() iter.Seq[map[K]V] {
+	return func(yield func(map[K]V) bool) {
 		for {
-			key := a.key.Generate()
+			size := a.rand.IntN(a.maxSize-a.minSize+1) + int(a.minSize)
+			result := make(map[K]V, size)
 
-			if _, exists := result[key]; !exists {
-				result[key] = a.value.Generate()
-				break
-			}
-		}
-	}
-	return result
-}
+			for i := 0; i < size; i++ {
+				for {
+					key := First(a.key.Generate())
 
-func (a *arbitraryMap[K, V]) Shrink(input map[K]V) []map[K]V {
-	var shrunk []map[K]V
-
-	if len(input) > 0 {
-		halfSize := len(input) / 2
-		smaller := make(map[K]V, halfSize)
-		i := 0
-		for k, v := range input {
-			if i >= halfSize {
-				break
-			}
-			smaller[k] = v
-			i++
-		}
-		shrunk = append(shrunk, smaller)
-	}
-
-	for k, v := range input {
-		for _, smallerV := range a.value.Shrink(v) {
-			newMap := make(map[K]V, len(input))
-			for k2, v2 := range input {
-				newMap[k2] = v2
-			}
-			newMap[k] = smallerV
-			shrunk = append(shrunk, newMap)
-		}
-	}
-
-	if len(input) > 0 {
-		for k := range input {
-			newMap := make(map[K]V, len(input)-1)
-			for k2, v := range input {
-				if k2 != k {
-					newMap[k2] = v
+					if _, exists := result[key]; !exists {
+						result[key] = First(a.value.Generate())
+						break
+					}
 				}
 			}
-			shrunk = append(shrunk, newMap)
+
+			if !yield(result) {
+				return
+			}
 		}
 	}
+}
 
-	if len(input) > 0 {
-		shrunk = append(shrunk, make(map[K]V))
+func (a *arbitraryMap[K, V]) Shrink(input map[K]V) iter.Seq[map[K]V] {
+	return func(yield func(map[K]V) bool) {
+		if len(input) > 0 {
+			halfSize := len(input) / 2
+			smaller := make(map[K]V, halfSize)
+			i := 0
+			for k, v := range input {
+				if i >= halfSize {
+					break
+				}
+				smaller[k] = v
+				i++
+			}
+			if !yield(smaller) {
+				return
+			}
+		}
+
+		for k, v := range input {
+			for smallerV := range a.value.Shrink(v) {
+				newMap := make(map[K]V, len(input))
+				for k2, v2 := range input {
+					newMap[k2] = v2
+				}
+				newMap[k] = smallerV
+				if !yield(newMap) {
+					return
+				}
+			}
+		}
+
+		if len(input) > 0 {
+			for k := range input {
+				newMap := make(map[K]V, len(input)-1)
+				for k2, v := range input {
+					if k2 != k {
+						newMap[k2] = v
+					}
+				}
+				if !yield(newMap) {
+					return
+				}
+			}
+
+			empty := make(map[K]V)
+			if !yield(empty) {
+				return
+			}
+		}
 	}
-
-	return shrunk
 }

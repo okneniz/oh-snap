@@ -1,6 +1,7 @@
 package ohsnap
 
 import (
+	"iter"
 	"math/rand/v2"
 )
 
@@ -28,42 +29,53 @@ func ArbitrarySlice[T any](
 	}
 }
 
-func (a *arbitrarySlice[T]) Generate() []T {
-	length := a.rand.IntN(a.maxLen-a.minLen+1) + int(a.minLen)
+func (a *arbitrarySlice[T]) Generate() iter.Seq[[]T] {
+	return func(yield func([]T) bool) {
+		for {
+			length := a.rand.IntN(a.maxLen-a.minLen+1) + int(a.minLen)
 
-	slice := make([]T, length)
-	for i := range slice {
-		slice[i] = a.elem.Generate()
+			slice := make([]T, length)
+			for i := range slice {
+				slice[i] = First(a.elem.Generate())
+			}
+
+			if !yield(slice) {
+				return
+			}
+		}
 	}
-
-	return slice
 }
 
-func (a *arbitrarySlice[T]) Shrink(slice []T) [][]T {
-	var shrunk [][]T
-
-	if len(slice) > 0 {
-		half := len(slice) / 2
-		shrunk = append(shrunk, slice[:half])
-	}
-
-	for i := range slice {
-		for _, smallerElem := range a.elem.Shrink(slice[i]) {
-			newSlice := make([]T, len(slice))
-			copy(newSlice, slice)
-			newSlice[i] = smallerElem
-			shrunk = append(shrunk, newSlice)
+func (a *arbitrarySlice[T]) Shrink(slice []T) iter.Seq[[]T] {
+	return func(yield func([]T) bool) {
+		if len(slice) > 0 {
+			half := len(slice) / 2
+			halfSlice := slice[:half]
+			if !yield(halfSlice) {
+				return
+			}
 		}
-	}
 
-	if len(slice) > 0 {
 		for i := range slice {
-			newSlice := make([]T, 0, len(slice)-1)
-			newSlice = append(newSlice, slice[:i]...)
-			newSlice = append(newSlice, slice[i+1:]...)
-			shrunk = append(shrunk, newSlice)
+			for smallerElem := range a.elem.Shrink(slice[i]) {
+				newSlice := make([]T, len(slice))
+				copy(newSlice, slice)
+				newSlice[i] = smallerElem
+				if !yield(newSlice) {
+					return
+				}
+			}
+		}
+
+		if len(slice) > 0 {
+			for i := range slice {
+				newSlice := make([]T, 0, len(slice)-1)
+				newSlice = append(newSlice, slice[:i]...)
+				newSlice = append(newSlice, slice[i+1:]...)
+				if !yield(newSlice) {
+					return
+				}
+			}
 		}
 	}
-
-	return shrunk
 }

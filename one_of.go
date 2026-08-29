@@ -1,6 +1,7 @@
 package ohsnap
 
 import (
+	"iter"
 	"math/rand/v2"
 )
 
@@ -19,12 +20,19 @@ func OneOf[T any](
 	}
 }
 
-func (a *arbitraryOneOf[T]) Generate() T {
-	idx := a.rand.IntN(len(a.arbs))
-	arb := a.arbs[idx]
-	return arb.Generate()
+func (a *arbitraryOneOf[T]) Generate() iter.Seq[T] {
+	return func(yield func(T) bool) {
+		for {
+			idx := a.rand.IntN(len(a.arbs))
+			arb := a.arbs[idx]
+			value := First(arb.Generate())
+			if !yield(value) {
+				return
+			}
+		}
+	}
 }
 
-func (a *arbitraryOneOf[T]) Shrink(variant T) []T {
-	return nil
+func (a *arbitraryOneOf[T]) Shrink(T) iter.Seq[T] {
+	return Empty[T]()
 }

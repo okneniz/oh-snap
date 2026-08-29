@@ -1,6 +1,7 @@
 package ohsnap
 
 import (
+	"iter"
 	"math/rand/v2"
 	"unicode"
 )
@@ -31,7 +32,18 @@ type arbitraryUnicode struct {
 	total int
 }
 
-func (a *arbitraryUnicode) Generate() rune {
+func (a *arbitraryUnicode) Generate() iter.Seq[rune] {
+	return func(yield func(rune) bool) {
+		for {
+			value := a.pick()
+			if !yield(value) {
+				return
+			}
+		}
+	}
+}
+
+func (a *arbitraryUnicode) pick() rune {
 	if a.total == 0 {
 		return 0 // fallback: no valid runes
 	}
@@ -58,7 +70,7 @@ func (a *arbitraryUnicode) Generate() rune {
 	return 0 // fallback, should not happen
 }
 
-func (a *arbitraryUnicode) Shrink(value rune) []rune {
+func (a *arbitraryUnicode) Shrink(rune) iter.Seq[rune] {
 	// No shrinking for now
-	return nil
+	return Empty[rune]()
 }
