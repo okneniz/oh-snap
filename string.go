@@ -3,6 +3,8 @@ package ohsnap
 import (
 	"iter"
 	"math/rand/v2"
+
+	"github.com/okneniz/oh-snap/shrink"
 )
 
 type arbitrationString struct {
@@ -47,12 +49,5 @@ func (a arbitrationString) Generate() iter.Seq[string] {
 }
 
 func (arbitrationString) Shrink(value string) iter.Seq[string] {
-	return func(yield func(string) bool) {
-		for len(value) > 0 {
-			value = value[:len(value)-1] // Remove the last character
-			if !yield(value) {
-				return
-			}
-		}
-	}
+	return shrink.Peel()(value)
 }

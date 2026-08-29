@@ -59,6 +59,7 @@ type arbitraryWeighted[T any] struct {
 	rand        *rand.Rand
 	entries     []*arbitraryWeightedEntry[T]
 	totalWeight int
+	lastArb     Arbitrary[T] // generator picked by the last Generate call
 }
 
 func (a *arbitraryWeighted[T]) Generate() iter.Seq[T] {
@@ -82,14 +83,22 @@ func (a *arbitraryWeighted[T]) pick() T {
 	for _, e := range a.entries {
 		acc += e.weight
 		if r < acc {
+			a.lastArb = e.arb
 			return First(e.arb.Generate())
 		}
 	}
 	// Fallback (should not happen)
-	return First(a.entries[len(a.entries)-1].arb.Generate())
+	last := a.entries[len(a.entries)-1].arb
+	a.lastArb = last
+	return First(last.Generate())
 }
 
-func (a *arbitraryWeighted[T]) Shrink(T) iter.Seq[T] {
-	// No shrinking for weighted combinator by default
-	return Empty[T]()
+// Shrink delegates shrinking to the generator picked by the last Generate
+// call. Before the first Generate it yields no candidates.
+func (a *arbitraryWeighted[T]) Shrink(value T) iter.Seq[T] {
+	if a.lastArb == nil {
+		return Empty[T]()
+	}
+
+	return a.lastArb.Shrink(value)
 }

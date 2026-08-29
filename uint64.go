@@ -3,6 +3,8 @@ package ohsnap
 import (
 	"iter"
 	"math/rand/v2"
+
+	"github.com/okneniz/oh-snap/shrink"
 )
 
 type arbitraryUint64 struct {
@@ -42,12 +44,5 @@ func (a arbitraryUint64) Generate() iter.Seq[uint64] {
 }
 
 func (a arbitraryUint64) Shrink(value uint64) iter.Seq[uint64] {
-	return func(yield func(uint64) bool) {
-		for value != 0 {
-			value /= 2
-			if !yield(value) {
-				return
-			}
-		}
-	}
+	return shrink.Halving[uint64](0)(value)
 }

@@ -65,3 +65,24 @@ func TestWeighted_EmptyOrAllZeroWeightsReturnsZeroValue(t *testing.T) {
 		t.Errorf("Expected zero value for all zero weights, got %v", val2)
 	}
 }
+
+func TestWeightedDelegatesShrinkToLastPick(t *testing.T) {
+	t.Parallel()
+
+	rnd := rand.New(rand.NewPCG(6, 6))
+
+	small := OneOfValue(rnd, 7) // only passing values
+	large := ArbitraryInt(rnd, 0, 100000)
+	arb := Weighted[int](rnd, map[int]Arbitrary[int]{
+		1: small,
+		3: large,
+	})
+
+	value, shrunk := findSimplestBadCase(1000, arb, func(x int) bool { return x == 7 })
+	if value == nil {
+		t.Fatal("expected property to fail")
+	}
+	if *shrunk != 0 {
+		t.Errorf("shrunk = %d, want 0 (delegated halving of the large generator)", *shrunk)
+	}
+}
