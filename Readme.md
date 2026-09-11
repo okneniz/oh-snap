@@ -71,14 +71,6 @@ biased  := ohsnap.Weighted(rnd, map[int]ohsnap.Arbitrary[int]{
 })
 ```
 
-The `Builder` configures bounds fluently:
-
-```go
-b := ohsnap.NewBuilder(rnd).MinInt(10).MaxInt(20).MaxSliceLen(5)
-ints := b.Int()
-slicesOfInts := b.IntSlice()
-```
-
 ### Shrinking strategies
 
 ```go

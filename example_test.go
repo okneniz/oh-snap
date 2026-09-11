@@ -217,20 +217,6 @@ func ExampleRuneFromTable() {
 	// U+28817 '𨠗'
 }
 
-// The Builder configures bounds fluently and produces any generator.
-func ExampleBuilder() {
-	rnd := rand.New(rand.NewPCG(16, 16))
-	b := ohsnap.NewBuilder(rnd).
-		MinInt(10).MaxInt(20).
-		MinSliceLen(2).MaxSliceLen(4)
-
-	fmt.Println(ohsnap.First(b.Int().Generate()))
-	fmt.Println(ohsnap.First(b.IntSlice().Generate()))
-	// Output:
-	// 11
-	// [17 12 15]
-}
-
 // Shrink returns candidates simpler than the value: ints halve toward zero.
 func Example_shrinking() {
 	rnd := rand.New(rand.NewPCG(17, 17))

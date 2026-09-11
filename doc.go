@@ -36,11 +36,7 @@
 //
 // Containers and combinators build bigger arbitraries from smaller ones:
 // [ArbitrarySlice], [ArbitraryMap], [Combine] (pairs), [Map] (transform),
-// [OneOf], [OneOfValue] and [Weighted] (choice). The [Builder] configures
-// bounds fluently and produces any primitive or slice generator:
-//
-//	b := ohsnap.NewBuilder(rnd).MinInt(10).MaxInt(20).MaxSliceLen(5)
-//	arb := b.IntSlice()
+// [OneOf], [OneOfValue] and [Weighted] (choice).
 //
 // # Shrinking
 //
