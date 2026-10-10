@@ -177,7 +177,7 @@ func ExampleOneOf() {
 	rnd := rand.New(rand.NewPCG(13, 13))
 	small := ohsnap.ArbitraryInt(rnd, 1, 6)
 	large := ohsnap.ArbitraryInt(rnd, 100, 200)
-	die := ohsnap.OneOf(rnd, []ohsnap.Arbitrary[int]{small, large})
+	die := ohsnap.OneOf(rnd, small, large)
 
 	fmt.Println(die.Generate())
 	// Output:

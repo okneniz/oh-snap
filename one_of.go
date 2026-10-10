@@ -13,8 +13,12 @@ type arbitraryOneOf[T any] struct {
 
 func OneOf[T any](
 	rnd *rand.Rand,
-	arbs []Arbitrary[T],
+	arbs ...Arbitrary[T],
 ) Arbitrary[T] {
+	if len(arbs) == 1 {
+		return arbs[0]
+	}
+
 	return &arbitraryOneOf[T]{
 		rand: rnd,
 		arbs: arbs,

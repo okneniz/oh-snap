@@ -35,7 +35,7 @@ func TestRuneFromTable(t *testing.T) {
 		arbs = append(arbs, arb)
 	}
 
-	arb := OneOf(rnd, arbs)
+	arb := OneOf(rnd, arbs...)
 
 	Check(t, iterations, arb, func(p Pair[rune, *unicode.RangeTable]) bool {
 		char := p.First
