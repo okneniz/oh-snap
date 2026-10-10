@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"math/rand/v2"
 
-	ohsnap "github.com/okneniz/oh-snap"
 	ohjson "github.com/okneniz/oh-snap/json"
 )
 
@@ -20,7 +19,7 @@ func ExampleArbitraryJSON() {
 	roundtripped := 0
 
 	for i := 0; i < documents; i++ {
-		value := ohsnap.First(arb.Generate())
+		value := arb.Generate()
 
 		data, err := stdjson.Marshal(value)
 		if err != nil {

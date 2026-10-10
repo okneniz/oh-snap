@@ -30,22 +30,15 @@ func ArbitraryString(rnd *rand.Rand, letters string, from, to int) Arbitrary[str
 	}
 }
 
-func (a arbitrationString) Generate() iter.Seq[string] {
-	return func(yield func(string) bool) {
-		for {
-			length := a.rand.IntN(a.to-a.from+1) + int(a.from)
-			result := make([]byte, length)
+func (a arbitrationString) Generate() string {
+	length := a.rand.IntN(a.to-a.from+1) + int(a.from)
+	result := make([]byte, length)
 
-			for i := range result {
-				result[i] = a.letters[a.rand.IntN(len(a.letters))]
-			}
-
-			value := string(result)
-			if !yield(value) {
-				return
-			}
-		}
+	for i := range result {
+		result[i] = a.letters[a.rand.IntN(len(a.letters))]
 	}
+
+	return string(result)
 }
 
 func (arbitrationString) Shrink(value string) iter.Seq[string] {

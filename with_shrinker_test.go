@@ -49,7 +49,7 @@ func TestWithShrinkerKeepsGenerate(t *testing.T) {
 	arb := WithShrinker(ArbitraryInt(rnd, 5, 10), shrink.NoShrink[int]())
 
 	for i := 0; i < 100; i++ {
-		value := First(arb.Generate())
+		value := arb.Generate()
 		if value < 5 || value > 10 {
 			t.Errorf("value = %d, want it in [5, 10]", value)
 		}

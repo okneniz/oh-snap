@@ -18,17 +18,10 @@ type combinedArbitrary[T, U any] struct {
 	arbU Arbitrary[U]
 }
 
-func (c *combinedArbitrary[T, U]) Generate() iter.Seq[Pair[T, U]] {
-	return func(yield func(Pair[T, U]) bool) {
-		for {
-			pair := Pair[T, U]{
-				First:  First(c.arbT.Generate()),
-				Second: First(c.arbU.Generate()),
-			}
-			if !yield(pair) {
-				return
-			}
-		}
+func (c *combinedArbitrary[T, U]) Generate() Pair[T, U] {
+	return Pair[T, U]{
+		First:  c.arbT.Generate(),
+		Second: c.arbU.Generate(),
 	}
 }
 

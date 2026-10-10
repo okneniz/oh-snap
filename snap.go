@@ -10,7 +10,7 @@ import (
 // Generate returns a lazy, effectively infinite sequence of random values.
 // Shrink returns a lazy sequence of candidates simpler than the input value.
 type Arbitrary[T any] interface {
-	Generate() iter.Seq[T]
+	Generate() T
 	Shrink(T) iter.Seq[T]
 }
 
@@ -73,7 +73,12 @@ func findSimplestBadCase[T any](iterations int, arb Arbitrary[T], prop Property[
 	return findSimplestBadCaseWith(iterations, arb, prop, CheckOptions{})
 }
 
-func findSimplestBadCaseWith[T any](iterations int, arb Arbitrary[T], prop Property[T], opts CheckOptions) (*T, *T) {
+func findSimplestBadCaseWith[T any](
+	iterations int,
+	arb Arbitrary[T],
+	prop Property[T],
+	opts CheckOptions,
+) (*T, *T) {
 	if opts.Logger == nil {
 		opts.Logger = nopLogger{}
 	}
@@ -86,7 +91,10 @@ func findSimplestBadCaseWith[T any](iterations int, arb Arbitrary[T], prop Prope
 
 	i := 0
 	passed := 0
-	for value := range arb.Generate() {
+
+	for {
+		value := arb.Generate()
+
 		if i >= iterations {
 			break
 		}

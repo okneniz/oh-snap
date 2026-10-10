@@ -57,15 +57,8 @@ type depthArbitrary struct {
 	depth  int
 }
 
-func (d *depthArbitrary) Generate() iter.Seq[Value] {
-	return func(yield func(Value) bool) {
-		for {
-			value := d.parent.generateAt(d.depth)
-			if !yield(value) {
-				return
-			}
-		}
-	}
+func (d *depthArbitrary) Generate() Value {
+	return d.parent.generateAt(d.depth)
 }
 
 func (d *depthArbitrary) Shrink(v Value) iter.Seq[Value] {
@@ -119,15 +112,8 @@ func ArbitraryJSON(rnd *rand.Rand, maxDepth, maxSize int) ohsnap.Arbitrary[Value
 
 // Generate implements ohsnap.Arbitrary[Value]
 // It uses cached primitive and collection arbitraries.
-func (a *arbitraryJSON) Generate() iter.Seq[Value] {
-	return func(yield func(Value) bool) {
-		for {
-			value := a.generateAt(a.maxDepth)
-			if !yield(value) {
-				return
-			}
-		}
-	}
+func (a *arbitraryJSON) Generate() Value {
+	return a.generateAt(a.maxDepth)
 }
 
 // generateAt generates a JSON Value using remainingDepth to decide whether nesting is allowed.
@@ -136,38 +122,38 @@ func (a *arbitraryJSON) Generate() iter.Seq[Value] {
 func (a *arbitraryJSON) generateAt(remainingDepth int) Value {
 	// if no nesting allowed or maxSize==0, generate primitives only
 	if remainingDepth <= 0 || a.maxSize == 0 {
-		choice := ohsnap.First(a.arbChoice.Generate()) % 5 // null, bool, float, int, string
+		choice := a.arbChoice.Generate() % 5 // null, bool, float, int, string
 		switch choice {
 		case 0:
 			return nil
 		case 1:
-			return ohsnap.First(a.arbBool.Generate())
+			return a.arbBool.Generate()
 		case 2:
-			return ohsnap.First(a.arbFloat.Generate())
+			return a.arbFloat.Generate()
 		case 3:
-			return ohsnap.First(a.arbInt.Generate())
+			return a.arbInt.Generate()
 		default:
-			return ohsnap.First(a.arbString.Generate())
+			return a.arbString.Generate()
 		}
 	}
 
 	// when nesting allowed, include arrays and objects
-	choice := ohsnap.First(a.arbChoice.Generate()) % 7 // null, bool, float, int, string, array, object
+	choice := a.arbChoice.Generate() % 7 // null, bool, float, int, string, array, object
 	switch choice {
 	case 0:
 		return nil
 	case 1:
-		return ohsnap.First(a.arbBool.Generate())
+		return a.arbBool.Generate()
 	case 2:
-		return ohsnap.First(a.arbFloat.Generate())
+		return a.arbFloat.Generate()
 	case 3:
-		return ohsnap.First(a.arbInt.Generate())
+		return a.arbInt.Generate()
 	case 4:
-		return ohsnap.First(a.arbString.Generate())
+		return a.arbString.Generate()
 	case 5:
-		return ohsnap.First(a.arbArray.Generate())
+		return a.arbArray.Generate()
 	default:
-		return ohsnap.First(a.arbObject.Generate())
+		return a.arbObject.Generate()
 	}
 }
 

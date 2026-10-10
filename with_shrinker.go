@@ -20,7 +20,7 @@ type reshrinked[T any] struct {
 	shrinker  shrink.Shrinker[T]
 }
 
-func (r *reshrinked[T]) Generate() iter.Seq[T] {
+func (r *reshrinked[T]) Generate() T {
 	return r.arbitrary.Generate()
 }
 

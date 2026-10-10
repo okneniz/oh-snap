@@ -62,15 +62,8 @@ type arbitraryWeighted[T any] struct {
 	lastArb     Arbitrary[T] // generator picked by the last Generate call
 }
 
-func (a *arbitraryWeighted[T]) Generate() iter.Seq[T] {
-	return func(yield func(T) bool) {
-		for {
-			value := a.pick()
-			if !yield(value) {
-				return
-			}
-		}
-	}
+func (a *arbitraryWeighted[T]) Generate() T {
+	return a.pick()
 }
 
 func (a *arbitraryWeighted[T]) pick() T {
@@ -84,13 +77,13 @@ func (a *arbitraryWeighted[T]) pick() T {
 		acc += e.weight
 		if r < acc {
 			a.lastArb = e.arb
-			return First(e.arb.Generate())
+			return e.arb.Generate()
 		}
 	}
 	// Fallback (should not happen)
 	last := a.entries[len(a.entries)-1].arb
 	a.lastArb = last
-	return First(last.Generate())
+	return last.Generate()
 }
 
 // Shrink delegates shrinking to the generator picked by the last Generate

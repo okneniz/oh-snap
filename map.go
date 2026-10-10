@@ -28,28 +28,22 @@ func ArbitraryMap[K comparable, V any](
 	}
 }
 
-func (a *arbitraryMap[K, V]) Generate() iter.Seq[map[K]V] {
-	return func(yield func(map[K]V) bool) {
+func (a *arbitraryMap[K, V]) Generate() map[K]V {
+	size := a.rand.IntN(a.maxSize-a.minSize+1) + int(a.minSize)
+	result := make(map[K]V, size)
+
+	for i := 0; i < size; i++ {
 		for {
-			size := a.rand.IntN(a.maxSize-a.minSize+1) + int(a.minSize)
-			result := make(map[K]V, size)
+			key := a.key.Generate()
 
-			for i := 0; i < size; i++ {
-				for {
-					key := First(a.key.Generate())
-
-					if _, exists := result[key]; !exists {
-						result[key] = First(a.value.Generate())
-						break
-					}
-				}
-			}
-
-			if !yield(result) {
-				return
+			if _, exists := result[key]; !exists {
+				result[key] = a.value.Generate()
+				break
 			}
 		}
 	}
+
+	return result
 }
 
 func (a *arbitraryMap[K, V]) Shrink(input map[K]V) iter.Seq[map[K]V] {

@@ -23,16 +23,9 @@ func OneOfValue[T any](
 	}
 }
 
-func (a *arbitraryOneOfValue[T]) Generate() iter.Seq[T] {
-	return func(yield func(T) bool) {
-		for {
-			idx := a.rand.IntN(len(a.values))
-			value := a.values[idx]
-			if !yield(value) {
-				return
-			}
-		}
-	}
+func (a *arbitraryOneOfValue[T]) Generate() T {
+	idx := a.rand.IntN(len(a.values))
+	return a.values[idx]
 }
 
 func (a *arbitraryOneOfValue[T]) Shrink(T) iter.Seq[T] {

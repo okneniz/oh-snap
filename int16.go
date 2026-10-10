@@ -27,20 +27,13 @@ func ArbitraryInt16(rnd *rand.Rand, from, to int16) Arbitrary[int16] {
 	}
 }
 
-func (a arbitraryInt16) Generate() iter.Seq[int16] {
-	return func(yield func(int16) bool) {
-		x := a.to - a.from
-		if x == 0 {
-			x++
-		}
-
-		for {
-			value := int16(a.rand.IntN(int(x))) + a.from
-			if !yield(value) {
-				return
-			}
-		}
+func (a arbitraryInt16) Generate() int16 {
+	x := a.to - a.from
+	if x == 0 {
+		x++
 	}
+
+	return int16(a.rand.IntN(int(x))) + a.from
 }
 
 func (arbitraryInt16) Shrink(value int16) iter.Seq[int16] {

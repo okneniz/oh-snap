@@ -27,15 +27,8 @@ func ArbitraryFloat32(rnd *rand.Rand, from, to float32) Arbitrary[float32] {
 	}
 }
 
-func (a arbitraryFloat32) Generate() iter.Seq[float32] {
-	return func(yield func(float32) bool) {
-		for {
-			value := a.from + a.rand.Float32()*(a.to-a.from)
-			if !yield(value) {
-				return
-			}
-		}
-	}
+func (a arbitraryFloat32) Generate() float32 {
+	return a.from + a.rand.Float32()*(a.to-a.from)
 }
 
 func (arbitraryFloat32) Shrink(value float32) iter.Seq[float32] {

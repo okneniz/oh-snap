@@ -26,18 +26,11 @@ func ArbitraryTime(rnd *rand.Rand, from, to time.Time) Arbitrary[time.Time] {
 	}
 }
 
-func (a arbitraryTime) Generate() iter.Seq[time.Time] {
-	return func(yield func(time.Time) bool) {
-		n := a.to.UnixNano() - a.from.UnixNano()
+func (a arbitraryTime) Generate() time.Time {
+	n := a.to.UnixNano() - a.from.UnixNano()
 
-		for {
-			nanoSeconds := a.rand.Int64N(n)
-			value := time.Unix(0, a.from.UnixNano()+nanoSeconds)
-			if !yield(value) {
-				return
-			}
-		}
-	}
+	nanoSeconds := a.rand.Int64N(n)
+	return time.Unix(0, a.from.UnixNano()+nanoSeconds)
 }
 
 func (arbitraryTime) Shrink(t time.Time) iter.Seq[time.Time] {

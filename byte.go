@@ -27,20 +27,13 @@ func ArbitraryByte(rnd *rand.Rand, from, to byte) Arbitrary[byte] {
 	}
 }
 
-func (a arbitraryByte) Generate() iter.Seq[byte] {
-	return func(yield func(byte) bool) {
-		x := uint(a.to - a.from)
-		if x == 0 {
-			x++
-		}
-
-		for {
-			value := byte(a.rand.UintN(x)) + a.from
-			if !yield(value) {
-				return
-			}
-		}
+func (a arbitraryByte) Generate() byte {
+	x := uint(a.to - a.from)
+	if x == 0 {
+		x++
 	}
+
+	return byte(a.rand.UintN(x)) + a.from
 }
 
 func (arbitraryByte) Shrink(value byte) iter.Seq[byte] {

@@ -27,20 +27,13 @@ func ArbitraryInt8(rnd *rand.Rand, from, to int8) Arbitrary[int8] {
 	}
 }
 
-func (a arbitraryInt8) Generate() iter.Seq[int8] {
-	return func(yield func(int8) bool) {
-		x := int(a.to - a.from)
-		if x == 0 {
-			x++
-		}
-
-		for {
-			value := int8(a.rand.IntN(x)) + a.from
-			if !yield(value) {
-				return
-			}
-		}
+func (a arbitraryInt8) Generate() int8 {
+	x := int(a.to - a.from)
+	if x == 0 {
+		x++
 	}
+
+	return int8(a.rand.IntN(x)) + a.from
 }
 
 func (arbitraryInt8) Shrink(value int8) iter.Seq[int8] {

@@ -11,14 +11,17 @@ import (
 // tbl - bounds for generated runes.
 func RuneFromTable(rnd *rand.Rand, tbl *unicode.RangeTable) Arbitrary[rune] {
 	total := 0
+
 	for _, r := range tbl.R16 {
 		count := int((r.Hi-r.Lo)/r.Stride) + 1
 		total += count
 	}
+
 	for _, r := range tbl.R32 {
 		count := int((r.Hi-r.Lo)/r.Stride) + 1
 		total += count
 	}
+
 	return &arbitraryUnicode{
 		rnd:   rnd,
 		tbl:   tbl,
@@ -32,21 +35,11 @@ type arbitraryUnicode struct {
 	total int
 }
 
-func (a *arbitraryUnicode) Generate() iter.Seq[rune] {
-	return func(yield func(rune) bool) {
-		for {
-			value := a.pick()
-			if !yield(value) {
-				return
-			}
-		}
-	}
-}
-
-func (a *arbitraryUnicode) pick() rune {
+func (a *arbitraryUnicode) Generate() rune {
 	if a.total == 0 {
 		return 0 // fallback: no valid runes
 	}
+
 	n := a.rnd.IntN(a.total)
 	tbl := a.tbl
 
@@ -58,6 +51,7 @@ func (a *arbitraryUnicode) pick() rune {
 		}
 		n -= count
 	}
+
 	// Pick from R32
 	for _, r := range tbl.R32 {
 		count := int((r.Hi-r.Lo)/r.Stride) + 1

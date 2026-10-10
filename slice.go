@@ -29,21 +29,15 @@ func ArbitrarySlice[T any](
 	}
 }
 
-func (a *arbitrarySlice[T]) Generate() iter.Seq[[]T] {
-	return func(yield func([]T) bool) {
-		for {
-			length := a.rand.IntN(a.maxLen-a.minLen+1) + int(a.minLen)
+func (a *arbitrarySlice[T]) Generate() []T {
+	length := a.rand.IntN(a.maxLen-a.minLen+1) + int(a.minLen)
 
-			slice := make([]T, length)
-			for i := range slice {
-				slice[i] = First(a.elem.Generate())
-			}
-
-			if !yield(slice) {
-				return
-			}
-		}
+	slice := make([]T, length)
+	for i := range slice {
+		slice[i] = a.elem.Generate()
 	}
+
+	return slice
 }
 
 func (a *arbitrarySlice[T]) Shrink(slice []T) iter.Seq[[]T] {

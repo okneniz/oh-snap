@@ -27,20 +27,13 @@ func ArbitraryUint(rnd *rand.Rand, from, to uint) Arbitrary[uint] {
 	}
 }
 
-func (a arbitraryUint) Generate() iter.Seq[uint] {
-	return func(yield func(uint) bool) {
-		x := a.to - a.from
-		if x == 0 {
-			x++
-		}
-
-		for {
-			value := a.rand.UintN(x) + a.from
-			if !yield(value) {
-				return
-			}
-		}
+func (a arbitraryUint) Generate() uint {
+	x := a.to - a.from
+	if x == 0 {
+		x++
 	}
+
+	return a.rand.UintN(x) + a.from
 }
 
 func (arbitraryUint) Shrink(value uint) iter.Seq[uint] {

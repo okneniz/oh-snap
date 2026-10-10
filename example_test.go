@@ -60,14 +60,11 @@ func Example_stream() {
 	rnd := rand.New(rand.NewPCG(3, 3))
 	arb := ohsnap.ArbitraryInt(rnd, 1, 6)
 
-	i := 0
-	for value := range arb.Generate() {
+	for range 10 {
+		value := arb.Generate()
 		fmt.Print(value, " ")
-		i++
-		if i == 10 {
-			break
-		}
 	}
+
 	fmt.Println()
 	// Output:
 	// 2 3 1 4 4 2 5 3 5 2
@@ -78,7 +75,7 @@ func ExampleFirst() {
 	rnd := rand.New(rand.NewPCG(4, 4))
 	dice := ohsnap.ArbitraryInt(rnd, 1, 6)
 
-	fmt.Println("dice:", ohsnap.First(dice.Generate()))
+	fmt.Println("dice:", dice.Generate())
 	// Output:
 	// dice: 4
 }
@@ -87,13 +84,12 @@ func ExampleArbitraryInt() {
 	rnd := rand.New(rand.NewPCG(5, 5))
 	arb := ohsnap.ArbitraryInt(rnd, -10, 10)
 
-	values := []int{}
-	for value := range arb.Generate() {
+	values := make([]int, 0, 5)
+	for range 5 {
+		value := arb.Generate()
 		values = append(values, value)
-		if len(values) == 5 {
-			break
-		}
 	}
+
 	fmt.Println(values)
 	// Output:
 	// [4 0 -6 -7 -10]
@@ -103,7 +99,7 @@ func ExampleArbitraryString() {
 	rnd := rand.New(rand.NewPCG(6, 6))
 	arb := ohsnap.ArbitraryString(rnd, "ab", 8, 8)
 
-	fmt.Println(ohsnap.First(arb.Generate()))
+	fmt.Println(arb.Generate())
 	// Output:
 	// bbabbbba
 }
@@ -114,7 +110,7 @@ func ExampleArbitraryTime() {
 	to := time.Date(2024, time.December, 31, 23, 59, 59, 0, time.UTC)
 	arb := ohsnap.ArbitraryTime(rnd, from, to)
 
-	moment := ohsnap.First(arb.Generate())
+	moment := arb.Generate()
 	fmt.Println(moment.Year(), moment.Month(), moment.Day())
 	// Output:
 	// 2024 December 17
@@ -125,7 +121,7 @@ func ExampleArbitrarySlice() {
 	elem := ohsnap.ArbitraryInt(rnd, 0, 9)
 	arb := ohsnap.ArbitrarySlice(rnd, elem, 3, 5)
 
-	fmt.Println(ohsnap.First(arb.Generate()))
+	fmt.Println(arb.Generate())
 	// Output:
 	// [2 6 5]
 }
@@ -137,7 +133,7 @@ func ExampleArbitraryMap() {
 	values := ohsnap.ArbitraryInt(rnd, 0, 9)
 	arb := ohsnap.ArbitraryMap(rnd, keys, values, 1, 3)
 
-	fmt.Println(ohsnap.First(arb.Generate()))
+	fmt.Println(arb.Generate())
 	// Output:
 	// map[a:3 b:2 c:2]
 }
@@ -149,7 +145,7 @@ func ExampleCombine() {
 	active := ohsnap.ArbitraryBool(rnd)
 	users := ohsnap.Combine(ages, active)
 
-	user := ohsnap.First(users.Generate())
+	user := users.Generate()
 	fmt.Printf("age=%d active=%v\n", user.First, user.Second)
 	// Output:
 	// age=87 active=true
@@ -161,7 +157,7 @@ func ExampleMap() {
 	times := ohsnap.ArbitraryInt(rnd, 1, 3)
 	words := ohsnap.Map(times, func(n int) string { return strings.Repeat("ha", n) })
 
-	fmt.Println(ohsnap.First(words.Generate()) + "!")
+	fmt.Println(words.Generate() + "!")
 	// Output:
 	// ha!
 }
@@ -171,7 +167,7 @@ func ExampleOneOfValue() {
 	rnd := rand.New(rand.NewPCG(12, 12))
 	colors := ohsnap.OneOfValue(rnd, "red", "green", "blue")
 
-	fmt.Println(ohsnap.First(colors.Generate()))
+	fmt.Println(colors.Generate())
 	// Output:
 	// red
 }
@@ -183,7 +179,7 @@ func ExampleOneOf() {
 	large := ohsnap.ArbitraryInt(rnd, 100, 200)
 	die := ohsnap.OneOf(rnd, []ohsnap.Arbitrary[int]{small, large})
 
-	fmt.Println(ohsnap.First(die.Generate()))
+	fmt.Println(die.Generate())
 	// Output:
 	// 1
 }
@@ -199,7 +195,7 @@ func ExampleWeighted() {
 
 	counts := map[string]int{}
 	for i := 0; i < 1000; i++ {
-		counts[ohsnap.First(arb.Generate())]++
+		counts[arb.Generate()]++
 	}
 	fmt.Println(counts)
 	// Output:
@@ -211,7 +207,7 @@ func ExampleRuneFromTable() {
 	rnd := rand.New(rand.NewPCG(15, 15))
 	letters := ohsnap.RuneFromTable(rnd, unicode.Letter)
 
-	r := ohsnap.First(letters.Generate())
+	r := letters.Generate()
 	fmt.Printf("U+%04X %q\n", r, r)
 	// Output:
 	// U+28817 '𨠗'

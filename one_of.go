@@ -21,18 +21,11 @@ func OneOf[T any](
 	}
 }
 
-func (a *arbitraryOneOf[T]) Generate() iter.Seq[T] {
-	return func(yield func(T) bool) {
-		for {
-			idx := a.rand.IntN(len(a.arbs))
-			arb := a.arbs[idx]
-			a.lastArb = arb
-			value := First(arb.Generate())
-			if !yield(value) {
-				return
-			}
-		}
-	}
+func (a *arbitraryOneOf[T]) Generate() T {
+	idx := a.rand.IntN(len(a.arbs))
+	arb := a.arbs[idx]
+	a.lastArb = arb
+	return arb.Generate()
 }
 
 // Shrink delegates shrinking to the generator picked by the last Generate

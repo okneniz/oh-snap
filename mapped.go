@@ -18,15 +18,8 @@ func Map[T, U any](
 	}
 }
 
-func (a *mappedArbitrary[T, U]) Generate() iter.Seq[U] {
-	return func(yield func(U) bool) {
-		for {
-			value := a.f(First(a.arbitrary.Generate()))
-			if !yield(value) {
-				return
-			}
-		}
-	}
+func (a *mappedArbitrary[T, U]) Generate() U {
+	return a.f(a.arbitrary.Generate())
 }
 
 func (a *mappedArbitrary[T, U]) Shrink(U) iter.Seq[U] {

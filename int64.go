@@ -27,20 +27,13 @@ func ArbitraryInt64(rnd *rand.Rand, from, to int64) Arbitrary[int64] {
 	}
 }
 
-func (a arbitraryInt64) Generate() iter.Seq[int64] {
-	return func(yield func(int64) bool) {
-		x := a.to - a.from
-		if x == 0 {
-			x++
-		}
-
-		for {
-			value := a.rand.Int64N(x) + a.from
-			if !yield(value) {
-				return
-			}
-		}
+func (a arbitraryInt64) Generate() int64 {
+	x := a.to - a.from
+	if x == 0 {
+		x++
 	}
+
+	return a.rand.Int64N(x) + a.from
 }
 
 func (arbitraryInt64) Shrink(value int64) iter.Seq[int64] {

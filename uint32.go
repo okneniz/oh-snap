@@ -27,20 +27,13 @@ func ArbitraryUint32(rnd *rand.Rand, from, to uint32) Arbitrary[uint32] {
 	}
 }
 
-func (a arbitraryUint32) Generate() iter.Seq[uint32] {
-	return func(yield func(uint32) bool) {
-		x := a.to - a.from
-		if x == 0 {
-			x++
-		}
-
-		for {
-			value := a.rand.Uint32N(x) + a.from
-			if !yield(value) {
-				return
-			}
-		}
+func (a arbitraryUint32) Generate() uint32 {
+	x := a.to - a.from
+	if x == 0 {
+		x++
 	}
+
+	return a.rand.Uint32N(x) + a.from
 }
 
 func (arbitraryUint32) Shrink(value uint32) iter.Seq[uint32] {
