@@ -8,31 +8,33 @@ import (
 
 // traceShrinking returns options that log every tried shrink candidate
 // via t, making the work of the greedy algorithm visible in test output.
-func traceShrinking(t testing.TB) ohsnap.CheckOptions {
+func traceShrinking(tb testing.TB) ohsnap.CheckOptions {
+	tb.Helper()
+
 	return ohsnap.CheckOptions{
 		LogShrinkCandidates: true,
-		Logger:              t,
+		Logger:              tb,
 	}
 }
 
 func checkShrinking[T comparable](
-	t testing.TB,
+	tb testing.TB,
 	arb ohsnap.Arbitrary[T],
 	expected T,
 	prop func(T) bool,
 ) {
-	t.Helper()
+	tb.Helper()
 
-	_, simplestValue := ohsnap.FindSimplestBadCase(1000, arb, prop, traceShrinking(t))
+	_, simplestValue := ohsnap.FindSimplestBadCase(1000, arb, prop, traceShrinking(tb))
 
 	if simplestValue == nil {
-		t.Error("bad value not found")
-		t.FailNow()
+		tb.Error("bad value not found")
+		tb.FailNow()
 	}
 
 	if *simplestValue != expected {
-		t.Errorf("expected: %v", expected)
-		t.Errorf("actual: %v", *simplestValue)
-		t.FailNow()
+		tb.Errorf("expected: %v", expected)
+		tb.Errorf("actual: %v", *simplestValue)
+		tb.FailNow()
 	}
 }

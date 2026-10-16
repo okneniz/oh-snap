@@ -11,7 +11,7 @@ import (
 // Shrink returns a lazy sequence of candidates simpler than the input value.
 type Arbitrary[T any] interface {
 	Generate() T
-	Shrink(T) iter.Seq[T]
+	Shrink(value T) iter.Seq[T]
 }
 
 // Property is a function that takes a value of type T and returns a boolean.
@@ -47,6 +47,8 @@ type CheckOptions struct {
 // Check runs property-based tests with random values and shrinking.
 // It is silent: use CheckWith to enable progress and shrink logging.
 func Check[T any](t *testing.T, iterations int, arb Arbitrary[T], prop Property[T]) {
+	t.Helper()
+
 	value, shrunk := FindSimplestBadCase(iterations, arb, prop, CheckOptions{})
 	reportFailure(t, value, shrunk)
 }
@@ -54,6 +56,8 @@ func Check[T any](t *testing.T, iterations int, arb Arbitrary[T], prop Property[
 // CheckWith runs property-based tests with custom options.
 // When opts.Logger is nil, the *testing.T is used for logging.
 func CheckWith[T any](t *testing.T, iterations int, arb Arbitrary[T], prop Property[T], opts CheckOptions) {
+	t.Helper()
+
 	if opts.Logger == nil {
 		opts.Logger = t
 	}
@@ -63,6 +67,8 @@ func CheckWith[T any](t *testing.T, iterations int, arb Arbitrary[T], prop Prope
 }
 
 func reportFailure[T any](t *testing.T, value, shrunk *T) {
+	t.Helper()
+
 	if value != nil {
 		t.Errorf("Property failed for value: %v (shrunk: %v)", *value, *shrunk)
 	}
@@ -99,6 +105,7 @@ func FindSimplestBadCase[T any](
 		if i >= iterations {
 			break
 		}
+
 		i++
 
 		if !prop(value) {
@@ -117,7 +124,10 @@ func FindSimplestBadCase[T any](
 				opts.Logger.Logf("minimal counterexample: %v (from %v, %d steps)", shrunk, value, st.steps)
 			} else {
 				used := opts.Budget - st.budget
-				opts.Logger.Logf("minimal counterexample: %v (from %v, %d steps, budget used %d/%d)", shrunk, value, st.steps, used, opts.Budget)
+				opts.Logger.Logf(
+					"minimal counterexample: %v (from %v, %d steps, budget used %d/%d)",
+					shrunk, value, st.steps, used, opts.Budget,
+				)
 			}
 
 			return &value, &shrunk
@@ -151,6 +161,7 @@ func shrinkValue[T any](arb Arbitrary[T], value T, prop Property[T], st *shrinkS
 			if st.budget <= 0 {
 				return value
 			}
+
 			st.budget--
 		}
 
@@ -169,6 +180,7 @@ func shrinkValue[T any](arb Arbitrary[T], value T, prop Property[T], st *shrinkS
 			if st.logSteps && !st.logCandidates {
 				st.logger.Logf("shrink %v → %v", value, smaller)
 			}
+
 			return shrinkValue(arb, smaller, prop, st)
 		}
 	}

@@ -16,9 +16,10 @@ func ExampleArbitraryJSON() {
 	arb := ohjson.ArbitraryJSON(rnd, 3, 5)
 
 	const documents = 100
+
 	roundtripped := 0
 
-	for i := 0; i < documents; i++ {
+	for range documents {
 		value := arb.Generate()
 
 		data, err := stdjson.Marshal(value)

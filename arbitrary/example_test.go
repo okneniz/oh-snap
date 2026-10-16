@@ -2,10 +2,11 @@ package arbitrary_test
 
 import (
 	"fmt"
-	"github.com/okneniz/oh-snap/arbitrary"
 	"math/rand/v2"
 	"time"
 	"unicode"
+
+	"github.com/okneniz/oh-snap/arbitrary"
 )
 
 // Generate returns a new random value on every call: loop to pull as
@@ -39,6 +40,7 @@ func ExampleInt() {
 	arb := arbitrary.Int(rnd, -10, 10)
 
 	values := make([]int, 0, 5)
+
 	for range 5 {
 		value := arb.Generate()
 		values = append(values, value)

@@ -11,6 +11,8 @@ type arbitraryOneOf[T any] struct {
 	lastArb Arbitrary[T] // generator picked by the last Generate call
 }
 
+// OneOf returns a generator that picks one of the given generators on every
+// Generate call and delegates shrinking to the last picked one.
 func OneOf[T any](
 	rnd *rand.Rand,
 	arbs ...Arbitrary[T],
@@ -29,6 +31,7 @@ func (a *arbitraryOneOf[T]) Generate() T {
 	idx := a.rand.IntN(len(a.arbs))
 	arb := a.arbs[idx]
 	a.lastArb = arb
+
 	return arb.Generate()
 }
 

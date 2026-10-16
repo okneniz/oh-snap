@@ -44,6 +44,7 @@ func TestCheckWithShrinkBudget(t *testing.T) {
 
 	rnd2 := rand.New(rand.NewPCG(11, 11))
 	arb2 := arbitrary.Int(rnd2, 1000, 2000)
+
 	_, unlimited := ohsnap.FindSimplestBadCase(1, arb2, prop, ohsnap.CheckOptions{
 		LogShrinkCandidates: true,
 		Logger:              t,
@@ -78,6 +79,7 @@ func TestCheckWithProgressLogging(t *testing.T) {
 	if !strings.Contains(out, "1 000 cases passed (") {
 		t.Errorf("expected progress message with humanized count, got:\n%s", out)
 	}
+
 	if strings.Count(out, "cases passed") != 1 {
 		t.Errorf("expected exactly one progress message for 1200 iterations, got:\n%s", out)
 	}
@@ -91,6 +93,7 @@ func TestCheckWithShrinkStepLogging(t *testing.T) {
 	prop := func(int) bool { return false } // every candidate fails
 
 	log := &bufferLogger{}
+
 	value, shrunk := ohsnap.FindSimplestBadCase(10, arb, prop, ohsnap.CheckOptions{
 		LogShrinkSteps: true,
 		Logger:         log,
@@ -98,6 +101,7 @@ func TestCheckWithShrinkStepLogging(t *testing.T) {
 	if value == nil {
 		t.Fatal("expected property to fail")
 	}
+
 	if *shrunk != 0 {
 		t.Errorf("shrunk = %d, want 0", *shrunk)
 	}
@@ -106,9 +110,11 @@ func TestCheckWithShrinkStepLogging(t *testing.T) {
 	if !strings.Contains(out, ", shrinking...") {
 		t.Errorf("expected failure header, got:\n%s", out)
 	}
+
 	if !strings.Contains(out, "shrink ") {
 		t.Errorf("expected shrink steps, got:\n%s", out)
 	}
+
 	if !strings.Contains(out, "minimal counterexample: 0 ") {
 		t.Errorf("expected final counterexample, got:\n%s", out)
 	}
@@ -122,6 +128,7 @@ func TestCheckWithBudgetLogging(t *testing.T) {
 	prop := func(int) bool { return false } // every candidate fails
 
 	log := &bufferLogger{}
+
 	_, shrunk := ohsnap.FindSimplestBadCase(1, arb, prop, ohsnap.CheckOptions{
 		Budget: 2,
 		Logger: log,

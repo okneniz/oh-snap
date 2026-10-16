@@ -32,6 +32,7 @@ func (a arbitraryTime) Generate() time.Time {
 	n := a.to.UnixNano() - a.from.UnixNano()
 
 	nanoSeconds := a.rand.Int64N(n)
+
 	return time.Unix(0, a.from.UnixNano()+nanoSeconds)
 }
 
@@ -39,6 +40,7 @@ func (arbitraryTime) Shrink(t time.Time) iter.Seq[time.Time] {
 	return func(yield func(time.Time) bool) {
 		for value := t.UnixNano(); value != 0; {
 			value /= 2
+
 			shrunk := time.Unix(0, value)
 			if !yield(shrunk) {
 				return

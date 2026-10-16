@@ -13,7 +13,7 @@ type arbitraryInt32 struct {
 	from, to int32
 }
 
-// Int32 - return generator for arbitray int32 values.
+// Int32 - return generator for arbitrary int32 values.
 // rnd - pseudo-random number generator.
 // from and to - bounds of generated values.
 func Int32(rnd *rand.Rand, from, to int32) ohsnap.Arbitrary[int32] {

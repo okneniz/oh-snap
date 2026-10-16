@@ -14,6 +14,7 @@ package json
 
 import (
 	"iter"
+	"maps"
 	"math/rand/v2"
 
 	ohsnap "github.com/okneniz/oh-snap"
@@ -27,8 +28,33 @@ import (
 // - int64 (for integer numbers)
 // - string
 // - []Value (array)
-// - map[string]Value (object)
+// - map[string]Value (object).
 type Value any
+
+// variants of the type choice selector.
+const (
+	variantNull = iota
+	variantBool
+	variantFloat
+	variantInt
+	variantString
+	variantArray
+	variantObject
+)
+
+const (
+	primitiveVariants = variantString + 1 // null, bool, float, int, string
+	nestedVariants    = variantObject + 1 // primitives + array, object
+)
+
+// bounds of generated primitives.
+const (
+	floatBound  = 1000
+	intBound    = 1_000_000
+	stringLen   = 20
+	keyLen      = 8
+	choiceBound = 1000
+)
 
 type arbitraryJSON struct {
 	rnd      *rand.Rand
@@ -74,6 +100,7 @@ func ArbitraryJSON(rnd *rand.Rand, maxDepth, maxSize int) ohsnap.Arbitrary[Value
 	if maxDepth < 0 {
 		maxDepth = 0
 	}
+
 	if maxSize < 0 {
 		maxSize = 0
 	}
@@ -88,20 +115,18 @@ func ArbitraryJSON(rnd *rand.Rand, maxDepth, maxSize int) ohsnap.Arbitrary[Value
 
 	// Create and cache primitive arbitraries once.
 	// create primitive arbitraries once and reuse them on every call
-	aj.arbFloat = arbitrary.Float64(rnd, -1000, 1000)
-	aj.arbInt = arbitrary.Int64(rnd, -1000000, 1000000)
-	aj.arbString = arbitrary.String(rnd, letters, 0, 20)
+	aj.arbFloat = arbitrary.Float64(rnd, -floatBound, floatBound)
+	aj.arbInt = arbitrary.Int64(rnd, -intBound, intBound)
+	aj.arbString = arbitrary.String(rnd, letters, 0, stringLen)
 	aj.arbBool = arbitrary.Bool(rnd)
-	aj.arbKey = arbitrary.String(rnd, letters, 1, 8)
+	aj.arbKey = arbitrary.String(rnd, letters, 1, keyLen)
 
 	// Use a single arbitrary for all type choices, using % to select the variant needed
-	aj.arbChoice = arbitrary.Int(rnd, 0, 1000)
+	aj.arbChoice = arbitrary.Int(rnd, 0, choiceBound)
 
 	// element depth for nested collections
-	elementDepth := maxDepth - 1
-	if elementDepth < 0 {
-		elementDepth = 0
-	}
+	elementDepth := max(maxDepth-1, 0)
+
 	depthElem := &depthArbitrary{parent: aj, depth: elementDepth}
 
 	// create collection arbitraries once using depth-wrapped element arbitrary
@@ -115,47 +140,6 @@ func ArbitraryJSON(rnd *rand.Rand, maxDepth, maxSize int) ohsnap.Arbitrary[Value
 // It uses cached primitive and collection arbitraries.
 func (a *arbitraryJSON) Generate() Value {
 	return a.generateAt(a.maxDepth)
-}
-
-// generateAt generates a JSON Value using remainingDepth to decide whether nesting is allowed.
-// Note: arrays/objects are generated via the cached collection arbitraries which were created
-// with element depth = maxDepth-1 at construction time.
-func (a *arbitraryJSON) generateAt(remainingDepth int) Value {
-	// if no nesting allowed or maxSize==0, generate primitives only
-	if remainingDepth <= 0 || a.maxSize == 0 {
-		choice := a.arbChoice.Generate() % 5 // null, bool, float, int, string
-		switch choice {
-		case 0:
-			return nil
-		case 1:
-			return a.arbBool.Generate()
-		case 2:
-			return a.arbFloat.Generate()
-		case 3:
-			return a.arbInt.Generate()
-		default:
-			return a.arbString.Generate()
-		}
-	}
-
-	// when nesting allowed, include arrays and objects
-	choice := a.arbChoice.Generate() % 7 // null, bool, float, int, string, array, object
-	switch choice {
-	case 0:
-		return nil
-	case 1:
-		return a.arbBool.Generate()
-	case 2:
-		return a.arbFloat.Generate()
-	case 3:
-		return a.arbInt.Generate()
-	case 4:
-		return a.arbString.Generate()
-	case 5:
-		return a.arbArray.Generate()
-	default:
-		return a.arbObject.Generate()
-	}
 }
 
 // Shrink delegates to cached arbitraries' Shrink methods and applies structural shrinking
@@ -212,12 +196,52 @@ func (a *arbitraryJSON) Shrink(v Value) iter.Seq[Value] {
 					return
 				}
 			}
+
 			for s := range a.shrinkObject(x) {
 				if !yield(s) {
 					return
 				}
 			}
 		}
+	}
+}
+
+// generateAt generates a JSON Value using remainingDepth to decide whether nesting is allowed.
+// Note: arrays/objects are generated via the cached collection arbitraries which were created
+// with element depth = maxDepth-1 at construction time.
+func (a *arbitraryJSON) generateAt(remainingDepth int) Value {
+	// if no nesting allowed or maxSize==0, generate primitives only
+	if remainingDepth <= 0 || a.maxSize == 0 {
+		switch a.arbChoice.Generate() % primitiveVariants {
+		case variantNull:
+			return nil
+		case variantBool:
+			return a.arbBool.Generate()
+		case variantFloat:
+			return a.arbFloat.Generate()
+		case variantInt:
+			return a.arbInt.Generate()
+		default:
+			return a.arbString.Generate()
+		}
+	}
+
+	// when nesting allowed, include arrays and objects
+	switch a.arbChoice.Generate() % nestedVariants {
+	case variantNull:
+		return nil
+	case variantBool:
+		return a.arbBool.Generate()
+	case variantFloat:
+		return a.arbFloat.Generate()
+	case variantInt:
+		return a.arbInt.Generate()
+	case variantString:
+		return a.arbString.Generate()
+	case variantArray:
+		return a.arbArray.Generate()
+	default:
+		return a.arbObject.Generate()
 	}
 }
 
@@ -235,6 +259,7 @@ func (a *arbitraryJSON) shrinkArray(arr []Value) iter.Seq[Value] {
 		if half > 0 {
 			prefix := make([]Value, half)
 			copy(prefix, arr[:half])
+
 			if !yield(prefix) {
 				return
 			}
@@ -245,6 +270,7 @@ func (a *arbitraryJSON) shrinkArray(arr []Value) iter.Seq[Value] {
 			for s := range a.Shrink(arr[i]) {
 				newArr := make([]Value, n)
 				copy(newArr, arr)
+
 				newArr[i] = s
 				if !yield(newArr) {
 					return
@@ -257,6 +283,7 @@ func (a *arbitraryJSON) shrinkArray(arr []Value) iter.Seq[Value] {
 			newArr := make([]Value, 0, n-1)
 			newArr = append(newArr, arr[:i]...)
 			newArr = append(newArr, arr[i+1:]...)
+
 			if !yield(newArr) {
 				return
 			}
@@ -280,14 +307,17 @@ func (a *arbitraryJSON) shrinkObject(m map[string]Value) iter.Seq[Value] {
 		halfSize := len(m) / 2
 		if halfSize > 0 {
 			smaller := make(map[string]Value, halfSize)
+
 			i := 0
 			for k, v := range m {
 				if i >= halfSize {
 					break
 				}
+
 				smaller[k] = v
 				i++
 			}
+
 			if !yield(smaller) {
 				return
 			}
@@ -297,9 +327,8 @@ func (a *arbitraryJSON) shrinkObject(m map[string]Value) iter.Seq[Value] {
 		for k, v := range m {
 			for sv := range a.Shrink(v) {
 				newMap := make(map[string]Value, len(m))
-				for k2, v2 := range m {
-					newMap[k2] = v2
-				}
+				maps.Copy(newMap, m)
+
 				newMap[k] = sv
 				if !yield(newMap) {
 					return
@@ -310,11 +339,13 @@ func (a *arbitraryJSON) shrinkObject(m map[string]Value) iter.Seq[Value] {
 		// remove single keys
 		for k := range m {
 			newMap := make(map[string]Value, len(m)-1)
+
 			for k2, v := range m {
 				if k2 != k {
 					newMap[k2] = v
 				}
 			}
+
 			if !yield(newMap) {
 				return
 			}

@@ -13,6 +13,7 @@ func TestWeighted_Generate_Distribution(t *testing.T) {
 
 	// Two arbitraries: 1 weight for "a", 3 weights for "b"
 	type letter string
+
 	arb := ohsnap.Weighted[letter](rnd, map[int]ohsnap.Arbitrary[letter]{
 		1: ohsnap.OneOfValue(rnd, letter("a")),
 		3: ohsnap.OneOfValue(rnd, letter("b")),
@@ -22,8 +23,9 @@ func TestWeighted_Generate_Distribution(t *testing.T) {
 		"a": 0,
 		"b": 0,
 	}
+
 	const samples = 4000
-	for i := 0; i < samples; i++ {
+	for range samples {
 		val := arb.Generate()
 		counts[val]++
 	}
@@ -45,7 +47,7 @@ func TestWeighted_ZeroOrNegativeWeightsAreIgnored(t *testing.T) {
 	})
 
 	// Only "42" should ever be generated
-	for i := 0; i < 100; i++ {
+	for range 100 {
 		val := arb.Generate()
 		if val != 42 {
 			t.Errorf("Expected only 42, got %v", val)
@@ -57,12 +59,14 @@ func TestWeighted_EmptyOrAllZeroWeightsReturnsZeroValue(t *testing.T) {
 	rnd := rand.New(rand.NewPCG(3, 4))
 
 	arb := ohsnap.Weighted[int](rnd, map[int]ohsnap.Arbitrary[int]{})
+
 	val := arb.Generate()
 	if val != 0 {
 		t.Errorf("Expected zero value for empty input, got %v", val)
 	}
 
 	arb2 := ohsnap.Weighted[int](rnd, map[int]ohsnap.Arbitrary[int]{0: ohsnap.OneOfValue(rnd, 99)})
+
 	val2 := arb2.Generate()
 	if val2 != 0 {
 		t.Errorf("Expected zero value for all zero weights, got %v", val2)
@@ -81,10 +85,16 @@ func TestWeightedDelegatesShrinkToLastPick(t *testing.T) {
 		3: large,
 	})
 
-	value, shrunk := ohsnap.FindSimplestBadCase(1000, arb, func(x int) bool { return x == 7 }, ohsnap.CheckOptions{LogShrinkCandidates: true, Logger: t})
+	value, shrunk := ohsnap.FindSimplestBadCase(
+		1000,
+		arb,
+		func(x int) bool { return x == 7 },
+		ohsnap.CheckOptions{LogShrinkCandidates: true, Logger: t},
+	)
 	if value == nil {
 		t.Fatal("expected property to fail")
 	}
+
 	if *shrunk != 0 {
 		t.Errorf("shrunk = %d, want 0 (delegated halving of the large generator)", *shrunk)
 	}

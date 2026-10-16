@@ -17,10 +17,16 @@ func TestOneOfDelegatesShrinkToLastPick(t *testing.T) {
 	large := arbitrary.Int(rnd, 0, 100000)
 	arb := ohsnap.OneOf(rnd, small, large)
 
-	value, shrunk := ohsnap.FindSimplestBadCase(1000, arb, func(x int) bool { return x == 7 }, ohsnap.CheckOptions{LogShrinkCandidates: true, Logger: t})
+	value, shrunk := ohsnap.FindSimplestBadCase(
+		1000,
+		arb,
+		func(x int) bool { return x == 7 },
+		ohsnap.CheckOptions{LogShrinkCandidates: true, Logger: t},
+	)
 	if value == nil {
 		t.Fatal("expected property to fail")
 	}
+
 	if *shrunk != 0 {
 		t.Errorf("shrunk = %d, want 0 (delegated halving of the large generator)", *shrunk)
 	}

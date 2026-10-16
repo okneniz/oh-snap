@@ -35,17 +35,17 @@ func HalveLength() Shrinker[string] {
 }
 
 // MinimizeChars returns a strategy that replaces one character at a time
-// with min. Use the minimal character of the generator alphabet.
-// Positions that already contain min are skipped.
-func MinimizeChars(min byte) Shrinker[string] {
+// with minChar. Use the minimal character of the generator alphabet.
+// Positions that already contain minChar are skipped.
+func MinimizeChars(minChar byte) Shrinker[string] {
 	return func(value string) iter.Seq[string] {
 		return func(yield func(string) bool) {
 			for i := range value {
-				if value[i] == min {
+				if value[i] == minChar {
 					continue
 				}
 
-				candidate := value[:i] + string(min) + value[i+1:]
+				candidate := value[:i] + string(minChar) + value[i+1:]
 				if !yield(candidate) {
 					return
 				}

@@ -12,8 +12,9 @@
 //
 //		ohsnap.Check(t, 1000, arb, func(xs []int) bool {
 //			dst := slices.Clone(xs)
-//			slices.Reverse(dst)
-//			slices.Reverse(dst)
+//			for range 2 {
+//				slices.Reverse(dst)
+//			}
 //			return slices.Equal(xs, dst)
 //		})
 //	}

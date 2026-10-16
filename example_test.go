@@ -32,6 +32,7 @@ func (l *clockFreeLogger) Logf(format string, args ...any) {
 	if i := strings.Index(line, " ("); i >= 0 {
 		line = line[:i]
 	}
+
 	l.lines = append(l.lines, line)
 }
 
@@ -109,9 +110,10 @@ func ExampleWeighted() {
 	})
 
 	counts := map[string]int{}
-	for i := 0; i < 1000; i++ {
+	for range 1000 {
 		counts[arb.Generate()]++
 	}
+
 	fmt.Println(counts)
 	// Output:
 	// map[a:234 b:766]
@@ -140,6 +142,7 @@ func ExampleWithShrinker() {
 	for candidate := range arb.Shrink(180) {
 		fmt.Print(candidate, " ")
 	}
+
 	fmt.Println()
 	// Output:
 	// 140 120 110 105 102 101 100

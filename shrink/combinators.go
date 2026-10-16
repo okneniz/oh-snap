@@ -11,10 +11,12 @@ func Concat[T any](shrinkers ...Shrinker[T]) Shrinker[T] {
 		return func(yield func(T) bool) {
 			for _, s := range shrinkers {
 				cont := true
+
 				s(value)(func(v T) bool {
 					cont = yield(v)
 					return cont
 				})
+
 				if !cont {
 					return
 				}
@@ -29,11 +31,14 @@ func Limit[T any](n int, s Shrinker[T]) Shrinker[T] {
 	return func(value T) iter.Seq[T] {
 		return func(yield func(T) bool) {
 			count := 0
+
 			s(value)(func(v T) bool {
 				if count >= n {
 					return false
 				}
+
 				count++
+
 				return yield(v)
 			})
 		}

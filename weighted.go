@@ -22,12 +22,16 @@ func Weighted[T any](rnd *rand.Rand, weightedArbs map[int]Arbitrary[T]) Arbitrar
 		weight int
 		arb    Arbitrary[T]
 	}
+
 	var entries []entry
+
 	totalWeight := 0
+
 	for w, arb := range weightedArbs {
 		if w <= 0 {
 			continue // skip zero or negative weights
 		}
+
 		entries = append(entries, entry{weight: w, arb: arb})
 		totalWeight += w
 	}
@@ -71,7 +75,9 @@ func (a *arbitraryWeighted[T]) pick() T {
 		var zero T
 		return zero
 	}
+
 	r := a.rand.IntN(a.totalWeight)
+
 	acc := 0
 	for _, e := range a.entries {
 		acc += e.weight
@@ -83,6 +89,7 @@ func (a *arbitraryWeighted[T]) pick() T {
 	// Fallback (should not happen)
 	last := a.entries[len(a.entries)-1].arb
 	a.lastArb = last
+
 	return last.Generate()
 }
 

@@ -32,7 +32,7 @@ func String(rnd *rand.Rand, letters string, from, to int) ohsnap.Arbitrary[strin
 }
 
 func (a arbitrationString) Generate() string {
-	length := a.rand.IntN(a.to-a.from+1) + int(a.from)
+	length := a.rand.IntN(a.to-a.from+1) + a.from
 	result := make([]byte, length)
 
 	for i := range result {

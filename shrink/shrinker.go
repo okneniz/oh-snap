@@ -28,6 +28,6 @@ type Number interface {
 // NoShrink returns a strategy without candidates.
 func NoShrink[T any]() Shrinker[T] {
 	return func(T) iter.Seq[T] {
-		return func(yield func(T) bool) {}
+		return func(func(T) bool) {}
 	}
 }

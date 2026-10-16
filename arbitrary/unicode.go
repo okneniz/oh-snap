@@ -52,6 +52,7 @@ func (a *arbitraryUnicode) Generate() rune {
 		if n < count {
 			return rune(r.Lo + uint16(n)*r.Stride)
 		}
+
 		n -= count
 	}
 
@@ -61,6 +62,7 @@ func (a *arbitraryUnicode) Generate() rune {
 		if n < count {
 			return rune(r.Lo + uint32(n)*r.Stride)
 		}
+
 		n -= count
 	}
 

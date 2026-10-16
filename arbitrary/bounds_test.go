@@ -18,7 +18,7 @@ func checkBounds[T num](
 	rnd *rand.Rand,
 	arbConstructor func(*rand.Rand, T, T) ohsnap.Arbitrary[T],
 	from, to T,
-	max T,
+	top T,
 ) {
 	t.Helper()
 
@@ -35,7 +35,7 @@ func checkBounds[T num](
 			}
 		}
 
-		arb := arbConstructor(rnd, max, max) // because int64 have huge bounds
-		ohsnap.Check(t, iterations, arb, func(x T) bool { return x == max })
+		arb := arbConstructor(rnd, top, top) // because int64 have huge bounds
+		ohsnap.Check(t, iterations, arb, func(x T) bool { return x == top })
 	})
 }

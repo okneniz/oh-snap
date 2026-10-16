@@ -12,6 +12,7 @@ func TestConcat(t *testing.T) {
 
 	got := slices.Collect(s(5))
 	want := []int{2, 1, 0, 7}
+
 	if !slices.Equal(got, want) {
 		t.Errorf("Concat(Halving, Boundaries)(5) = %v, want %v", got, want)
 	}
@@ -24,6 +25,7 @@ func TestLimit(t *testing.T) {
 
 	got := slices.Collect(s(5))
 	want := []int{2, 1}
+
 	if !slices.Equal(got, want) {
 		t.Errorf("Limit(2, Halving)(5) = %v, want %v", got, want)
 	}
@@ -36,6 +38,7 @@ func TestInterleave(t *testing.T) {
 
 	got := slices.Collect(s(9))
 	want := []int{1, 3, 2, 4}
+
 	if !slices.Equal(got, want) {
 		t.Errorf("Interleave(Boundaries, Boundaries)(9) = %v, want %v", got, want)
 	}

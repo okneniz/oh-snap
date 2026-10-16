@@ -1,0 +1,60 @@
+version: "2"
+
+linters:
+  default: all
+  disable:
+    # heuristic complexity limits: greedy shrinkers are branch-dense by design
+    - cyclop
+    - gocognit
+    # no import policy; the default rules misfire on the module's own packages
+    - depguard
+    # deprecated: replaced by gomodguard_v2
+    - gomodguard
+    # partial struct init with zero-value fields is deliberate here
+    - exhaustruct
+    - exhaustruct_v5
+    # property-based suites are long by nature
+    - funlen
+    # returning the Arbitrary[T] interface is the library's core API
+    - ireturn
+    # blank-line-before-return conflicts with the wsl_v5 whitespace standard
+    - nlreturn
+    # inline `if err := ...; err != nil` is idiomatic Go
+    - noinlineerr
+    # subtests share one seeded rand, inner parallelism would race
+    - paralleltest
+    - tparallel
+    # internal tests use unexported shared helpers on purpose
+    - testpackage
+    # short variable names are idiomatic Go
+    - varnamelen
+    # deprecated: replaced by wsl_v5
+    - wsl
+  settings:
+    gosec:
+      excludes:
+        # bounds math converts through ranges guarded by the constructor
+        - G115
+        # seeded math/rand/v2 is the library's determinism feature
+        - G404
+    mnd:
+      ignored-numbers:
+        # len(x)/2 halving is the shrink idiom
+        - "2"
+    wsl_v5:
+      allow-first-in-block: true
+      allow-whole-block: false
+      branch-max-lines: 2
+
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+  settings:
+    gofmt:
+      simplify: true
+    gci:
+      sections:
+        - standard
+        - default

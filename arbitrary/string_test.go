@@ -9,8 +9,6 @@ import (
 )
 
 func TestString(t *testing.T) {
-	t.Parallel()
-
 	iterations := 100000
 
 	seed := time.Now().UnixNano()
@@ -21,12 +19,11 @@ func TestString(t *testing.T) {
 	arb := String(rnd, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", 3, 10)
 
 	t.Run("concatenation", func(t *testing.T) {
-		t.Parallel()
-
 		t.Run("associative result", func(t *testing.T) {
 			ohsnap.Check(t, iterations, arb, func(a string) bool {
 				b := arb.Generate()
 				c := arb.Generate()
+
 				return (a+b)+c == a+(b+c)
 			})
 		})

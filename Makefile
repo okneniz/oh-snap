@@ -1,16 +1,19 @@
 default: test
 
 test:
-	go test -v -count=1 -vet=off ./...
+	go test -v -count=1 ./...
 
 install-linter:
 	go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.13.2
 
 lint: fmt
-	golangci-lint -c .golangci-lint.yml run ./...
+	golangci-lint run ./...
 
 fmt:
-	gofmt -w -s .
+	golangci-lint fmt
+
+race:
+	go test -race -count=1 ./...
 
 coverage:
 	go tool cover -func=coverage.out

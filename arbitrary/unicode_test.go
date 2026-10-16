@@ -19,7 +19,7 @@ func TestRuneFromTable(t *testing.T) {
 
 	rnd := rand.New(rand.NewPCG(0, uint64(seed)))
 
-	arbs := make([]ohsnap.Arbitrary[ohsnap.Pair[rune, *unicode.RangeTable]], 0)
+	arbs := make([]ohsnap.Arbitrary[ohsnap.Pair[rune, *unicode.RangeTable]], 0, len(unicode.Categories))
 
 	for _, x := range unicode.Categories {
 		tbl := x
@@ -42,6 +42,7 @@ func TestRuneFromTable(t *testing.T) {
 	ohsnap.Check(t, iterations, arb, func(p ohsnap.Pair[rune, *unicode.RangeTable]) bool {
 		char := p.First
 		unicodeTable := p.Second
+
 		return unicode.In(char, unicodeTable)
 	})
 }

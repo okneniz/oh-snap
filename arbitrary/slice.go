@@ -32,7 +32,7 @@ func Slice[T any](
 }
 
 func (a *arbitrarySlice[T]) Generate() []T {
-	length := a.rand.IntN(a.maxLen-a.minLen+1) + int(a.minLen)
+	length := a.rand.IntN(a.maxLen-a.minLen+1) + a.minLen
 
 	slice := make([]T, length)
 	for i := range slice {
@@ -46,6 +46,7 @@ func (a *arbitrarySlice[T]) Shrink(slice []T) iter.Seq[[]T] {
 	return func(yield func([]T) bool) {
 		if len(slice) > 0 {
 			half := len(slice) / 2
+
 			halfSlice := slice[:half]
 			if !yield(halfSlice) {
 				return
@@ -56,6 +57,7 @@ func (a *arbitrarySlice[T]) Shrink(slice []T) iter.Seq[[]T] {
 			for smallerElem := range a.elem.Shrink(slice[i]) {
 				newSlice := make([]T, len(slice))
 				copy(newSlice, slice)
+
 				newSlice[i] = smallerElem
 				if !yield(newSlice) {
 					return
@@ -68,6 +70,7 @@ func (a *arbitrarySlice[T]) Shrink(slice []T) iter.Seq[[]T] {
 				newSlice := make([]T, 0, len(slice)-1)
 				newSlice = append(newSlice, slice[:i]...)
 				newSlice = append(newSlice, slice[i+1:]...)
+
 				if !yield(newSlice) {
 					return
 				}
