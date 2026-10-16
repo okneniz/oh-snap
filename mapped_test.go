@@ -1,9 +1,12 @@
-package ohsnap
+package ohsnap_test
 
 import (
 	"math/rand/v2"
 	"testing"
 	"time"
+
+	ohsnap "github.com/okneniz/oh-snap"
+	"github.com/okneniz/oh-snap/arbitrary"
 )
 
 func TestMapped(t *testing.T) {
@@ -21,7 +24,7 @@ func TestMapped(t *testing.T) {
 		Date time.Time
 	}
 
-	names := ArbitraryString(
+	names := arbitrary.String(
 		rnd,
 		"abcdefgjihijklmnoprstwuxyz",
 		3,
@@ -30,17 +33,17 @@ func TestMapped(t *testing.T) {
 
 	year := 365 * 24 * time.Hour
 
-	dates := ArbitraryTime(
+	dates := arbitrary.Time(
 		rnd,
 		time.Now().Add(-40*year),
 		time.Now().Add(-18*year),
 	)
 
-	usersData := Combine(names, dates)
+	usersData := ohsnap.Combine(names, dates)
 
-	users := Map(
+	users := ohsnap.Map(
 		usersData,
-		func(p Pair[string, time.Time]) User {
+		func(p ohsnap.Pair[string, time.Time]) User {
 			return User{
 				Name: p.First,
 				Date: p.Second,
@@ -48,7 +51,7 @@ func TestMapped(t *testing.T) {
 		},
 	)
 
-	Check(t, iterations, users, func(p User) bool {
+	ohsnap.Check(t, iterations, users, func(p User) bool {
 		t.Log("user", p)
 		return true
 	})

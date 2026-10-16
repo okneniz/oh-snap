@@ -5,7 +5,7 @@
 // and plug into any generator via ohsnap.WithShrinker:
 //
 //	arb := ohsnap.WithShrinker(
-//	    ohsnap.ArbitraryInt(rnd, 100, 200),
+//	    arbitrary.Int(rnd, 100, 200),
 //	    shrink.Halving(100), // stay inside the range, shrink toward 100
 //	)
 package shrink

@@ -1,8 +1,11 @@
-package ohsnap
+package ohsnap_test
 
 import (
 	"math/rand/v2"
 	"testing"
+
+	ohsnap "github.com/okneniz/oh-snap"
+	"github.com/okneniz/oh-snap/arbitrary"
 )
 
 func TestWeighted_Generate_Distribution(t *testing.T) {
@@ -10,9 +13,9 @@ func TestWeighted_Generate_Distribution(t *testing.T) {
 
 	// Two arbitraries: 1 weight for "a", 3 weights for "b"
 	type letter string
-	arb := Weighted[letter](rnd, map[int]Arbitrary[letter]{
-		1: OneOfValue(rnd, letter("a")),
-		3: OneOfValue(rnd, letter("b")),
+	arb := ohsnap.Weighted[letter](rnd, map[int]ohsnap.Arbitrary[letter]{
+		1: ohsnap.OneOfValue(rnd, letter("a")),
+		3: ohsnap.OneOfValue(rnd, letter("b")),
 	})
 
 	counts := map[letter]int{
@@ -35,10 +38,10 @@ func TestWeighted_Generate_Distribution(t *testing.T) {
 func TestWeighted_ZeroOrNegativeWeightsAreIgnored(t *testing.T) {
 	rnd := rand.New(rand.NewPCG(1, 2))
 
-	arb := Weighted[int](rnd, map[int]Arbitrary[int]{
-		0:  OneOfValue(rnd, 1),
-		-2: OneOfValue(rnd, 2),
-		5:  OneOfValue(rnd, 42),
+	arb := ohsnap.Weighted[int](rnd, map[int]ohsnap.Arbitrary[int]{
+		0:  ohsnap.OneOfValue(rnd, 1),
+		-2: ohsnap.OneOfValue(rnd, 2),
+		5:  ohsnap.OneOfValue(rnd, 42),
 	})
 
 	// Only "42" should ever be generated
@@ -53,13 +56,13 @@ func TestWeighted_ZeroOrNegativeWeightsAreIgnored(t *testing.T) {
 func TestWeighted_EmptyOrAllZeroWeightsReturnsZeroValue(t *testing.T) {
 	rnd := rand.New(rand.NewPCG(3, 4))
 
-	arb := Weighted[int](rnd, map[int]Arbitrary[int]{})
+	arb := ohsnap.Weighted[int](rnd, map[int]ohsnap.Arbitrary[int]{})
 	val := arb.Generate()
 	if val != 0 {
 		t.Errorf("Expected zero value for empty input, got %v", val)
 	}
 
-	arb2 := Weighted[int](rnd, map[int]Arbitrary[int]{0: OneOfValue(rnd, 99)})
+	arb2 := ohsnap.Weighted[int](rnd, map[int]ohsnap.Arbitrary[int]{0: ohsnap.OneOfValue(rnd, 99)})
 	val2 := arb2.Generate()
 	if val2 != 0 {
 		t.Errorf("Expected zero value for all zero weights, got %v", val2)
@@ -71,14 +74,14 @@ func TestWeightedDelegatesShrinkToLastPick(t *testing.T) {
 
 	rnd := rand.New(rand.NewPCG(6, 6))
 
-	small := OneOfValue(rnd, 7) // only passing values
-	large := ArbitraryInt(rnd, 0, 100000)
-	arb := Weighted[int](rnd, map[int]Arbitrary[int]{
+	small := ohsnap.OneOfValue(rnd, 7) // only passing values
+	large := arbitrary.Int(rnd, 0, 100000)
+	arb := ohsnap.Weighted[int](rnd, map[int]ohsnap.Arbitrary[int]{
 		1: small,
 		3: large,
 	})
 
-	value, shrunk := findSimplestBadCaseWith(1000, arb, func(x int) bool { return x == 7 }, traceShrinking(t))
+	value, shrunk := ohsnap.FindSimplestBadCase(1000, arb, func(x int) bool { return x == 7 }, ohsnap.CheckOptions{LogShrinkCandidates: true, Logger: t})
 	if value == nil {
 		t.Fatal("expected property to fail")
 	}

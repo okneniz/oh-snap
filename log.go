@@ -12,7 +12,7 @@ type Logger interface {
 }
 
 // nopLogger drops all messages. It is the default logger for Check
-// and for direct findSimplestBadCase calls.
+// and for direct FindSimplestBadCase calls.
 type nopLogger struct{}
 
 func (nopLogger) Logf(string, ...any) {}

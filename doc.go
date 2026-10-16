@@ -8,7 +8,7 @@
 //
 //	func TestSortSorts(t *testing.T) {
 //		rnd := rand.New(rand.NewPCG(1, 2))
-//		arb := ohsnap.ArbitrarySlice(rnd, ohsnap.ArbitraryInt(rnd, 0, 100), 0, 10)
+//		arb := arbitrary.Slice(rnd, arbitrary.Int(rnd, 0, 100), 0, 10)
 //
 //		ohsnap.Check(t, 1000, arb, func(xs []int) bool {
 //			dst := slices.Clone(xs)
@@ -23,20 +23,21 @@
 //
 // # Arbitraries
 //
-// The central abstraction is [Arbitrary]. Generate returns a lazy,
-// effectively infinite stream of random values ([iter.Seq]): pull as many
-// as you need with a range loop, or take a single value with [First].
-// Shrink returns a lazy stream of candidates simpler than a given value.
+// The central abstraction is [Arbitrary]. Generate returns a new random
+// value on every call. Shrink returns a lazy stream of candidates simpler
+// than a given value.
 //
-// Generators for primitives cover all numeric types, bool, string, time and
-// runes (including [RuneFromTable] for unicode tables):
+// Generators live in the [github.com/okneniz/oh-snap/arbitrary] subpackage
+// and cover all numeric types, bool, string, time and runes (including
+// RuneFromTable for unicode tables):
 //
-//	arb := ohsnap.ArbitraryInt(rnd, -100, 100)
-//	x := ohsnap.First(arb.Generate())
+//	arb := arbitrary.Int(rnd, -100, 100)
+//	x := arb.Generate()
 //
-// Containers and combinators build bigger arbitraries from smaller ones:
-// [ArbitrarySlice], [ArbitraryMap], [Combine] (pairs), [Map] (transform),
-// [OneOf], [OneOfValue] and [Weighted] (choice).
+// Container generators build bigger arbitraries from smaller ones:
+// arbitrary.Slice, arbitrary.Map. The combinators [Combine] (pairs),
+// [Map] (transform), [OneOf], [OneOfValue] and [Weighted] (choice) stay
+// in this package.
 //
 // # Shrinking
 //
@@ -51,7 +52,7 @@
 // example to keep candidates inside the generator range:
 //
 //	arb := ohsnap.WithShrinker(
-//	    ohsnap.ArbitraryInt(rnd, 100, 200),
+//	    arbitrary.Int(rnd, 100, 200),
 //	    shrink.Halving(100), // shrink toward the lower bound
 //	)
 //
@@ -70,7 +71,9 @@
 //
 // # Subpackages
 //
+// The [github.com/okneniz/oh-snap/arbitrary] subpackage provides generators
+// for primitive types, strings, runes, time and containers.
+// The [github.com/okneniz/oh-snap/arbitrary/json] subpackage generates
+// arbitrary JSON documents, useful for testing parsers and serializers.
 // The [shrink] subpackage provides composable shrinking strategies.
-// The [github.com/okneniz/oh-snap/json] subpackage generates arbitrary
-// JSON documents, useful for testing parsers and serializers.
 package ohsnap

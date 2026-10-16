@@ -29,5 +29,5 @@ func (a *arbitraryOneOfValue[T]) Generate() T {
 }
 
 func (a *arbitraryOneOfValue[T]) Shrink(T) iter.Seq[T] {
-	return Empty[T]()
+	return empty[T]()
 }

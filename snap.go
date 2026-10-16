@@ -47,7 +47,7 @@ type CheckOptions struct {
 // Check runs property-based tests with random values and shrinking.
 // It is silent: use CheckWith to enable progress and shrink logging.
 func Check[T any](t *testing.T, iterations int, arb Arbitrary[T], prop Property[T]) {
-	value, shrunk := findSimplestBadCase(iterations, arb, prop)
+	value, shrunk := FindSimplestBadCase(iterations, arb, prop, CheckOptions{})
 	reportFailure(t, value, shrunk)
 }
 
@@ -58,7 +58,7 @@ func CheckWith[T any](t *testing.T, iterations int, arb Arbitrary[T], prop Prope
 		opts.Logger = t
 	}
 
-	value, shrunk := findSimplestBadCaseWith(iterations, arb, prop, opts)
+	value, shrunk := FindSimplestBadCase(iterations, arb, prop, opts)
 	reportFailure(t, value, shrunk)
 }
 
@@ -68,12 +68,13 @@ func reportFailure[T any](t *testing.T, value, shrunk *T) {
 	}
 }
 
-// findSimplestBadCase find simplest bad case of input value for property func
-func findSimplestBadCase[T any](iterations int, arb Arbitrary[T], prop Property[T]) (*T, *T) {
-	return findSimplestBadCaseWith(iterations, arb, prop, CheckOptions{})
-}
-
-func findSimplestBadCaseWith[T any](
+// FindSimplestBadCase runs the property on iterations random values. On the
+// first failure it shrinks the value and returns the original failing value
+// together with its minimal form. When every value passes, both results are
+// nil. It is the engine behind Check and CheckWith; call it directly when
+// you need the counterexample as a value instead of a test failure.
+// When opts.Logger is nil, no messages are logged.
+func FindSimplestBadCase[T any](
 	iterations int,
 	arb Arbitrary[T],
 	prop Property[T],

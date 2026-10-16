@@ -1,0 +1,42 @@
+package arbitrary
+
+import (
+	"math/rand/v2"
+	"reflect"
+	"testing"
+	"time"
+
+	ohsnap "github.com/okneniz/oh-snap"
+)
+
+func TestSlice(t *testing.T) {
+	t.Parallel()
+
+	const iterations = 100000
+
+	seed := time.Now().UnixNano()
+	t.Logf("seed: %v", seed)
+
+	rnd := rand.New(rand.NewPCG(0, uint64(seed)))
+
+	ints := Int(rnd, 3, 100)
+	arb := Slice(rnd, ints, 3, 10)
+
+	t.Run("double reverse change nothing", func(t *testing.T) {
+		reverse := func(slice []int) {
+			for i, j := 0, len(slice)-1; i < j; i, j = i+1, j-1 {
+				slice[i], slice[j] = slice[j], slice[i]
+			}
+		}
+
+		ohsnap.Check(t, iterations, arb, func(source []int) bool {
+			destination := make([]int, len(source))
+			_ = copy(destination, source)
+
+			reverse(destination)
+			reverse(destination)
+
+			return reflect.DeepEqual(source, destination)
+		})
+	})
+}

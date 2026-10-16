@@ -2,8 +2,8 @@ package ohsnap
 
 import "iter"
 
-// Empty returns an empty sequence.
+// empty returns an empty sequence.
 // It is useful for Shrink implementations without candidates.
-func Empty[T any]() iter.Seq[T] {
+func empty[T any]() iter.Seq[T] {
 	return func(yield func(T) bool) {}
 }

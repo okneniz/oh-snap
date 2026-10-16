@@ -13,8 +13,8 @@ import (
 // Example:
 //
 //	arb := Weighted(rnd, map[int]Arbitrary[int]{
-//	    1: ArbitraryInt(rnd, 0, 10),
-//	    3: ArbitraryInt(rnd, 100, 200),
+//	    1: arbitrary.Int(rnd, 0, 10),
+//	    3: arbitrary.Int(rnd, 100, 200),
 //	})
 func Weighted[T any](rnd *rand.Rand, weightedArbs map[int]Arbitrary[T]) Arbitrary[T] {
 	// Flatten map into slices for deterministic iteration order
@@ -90,7 +90,7 @@ func (a *arbitraryWeighted[T]) pick() T {
 // call. Before the first Generate it yields no candidates.
 func (a *arbitraryWeighted[T]) Shrink(value T) iter.Seq[T] {
 	if a.lastArb == nil {
-		return Empty[T]()
+		return empty[T]()
 	}
 
 	return a.lastArb.Shrink(value)

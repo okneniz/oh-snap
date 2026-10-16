@@ -23,5 +23,5 @@ func (a *mappedArbitrary[T, U]) Generate() U {
 }
 
 func (a *mappedArbitrary[T, U]) Shrink(U) iter.Seq[U] {
-	return Empty[U]()
+	return empty[U]()
 }

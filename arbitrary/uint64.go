@@ -1,0 +1,42 @@
+package arbitrary
+
+import (
+	"iter"
+	"math/rand/v2"
+
+	ohsnap "github.com/okneniz/oh-snap"
+	"github.com/okneniz/oh-snap/shrink"
+)
+
+type arbitraryUint64 struct {
+	rand     *rand.Rand
+	from, to uint64
+}
+
+// Uint64 - return generator for arbitrary uint64 values.
+// rnd - pseudo-random number generator.
+// from and to - bounds of generated values.
+func Uint64(rnd *rand.Rand, from, to uint64) ohsnap.Arbitrary[uint64] {
+	if from > to {
+		from, to = to, from
+	}
+
+	return &arbitraryUint64{
+		rand: rnd,
+		from: from,
+		to:   to,
+	}
+}
+
+func (a arbitraryUint64) Generate() uint64 {
+	x := a.to - a.from
+	if x == 0 {
+		x++
+	}
+
+	return a.rand.Uint64N(x) + a.from
+}
+
+func (a arbitraryUint64) Shrink(value uint64) iter.Seq[uint64] {
+	return shrink.Halving[uint64](0)(value)
+}

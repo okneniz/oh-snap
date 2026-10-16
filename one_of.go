@@ -36,7 +36,7 @@ func (a *arbitraryOneOf[T]) Generate() T {
 // call. Before the first Generate it yields no candidates.
 func (a *arbitraryOneOf[T]) Shrink(variant T) iter.Seq[T] {
 	if a.lastArb == nil {
-		return Empty[T]()
+		return empty[T]()
 	}
 
 	return a.lastArb.Shrink(variant)

@@ -1,4 +1,4 @@
-package ohsnap
+package ohsnap_test
 
 import (
 	"bytes"
@@ -6,6 +6,9 @@ import (
 	"math/rand/v2"
 	"strings"
 	"testing"
+
+	ohsnap "github.com/okneniz/oh-snap"
+	"github.com/okneniz/oh-snap/arbitrary"
 )
 
 type bufferLogger struct {
@@ -21,10 +24,10 @@ func TestCheckWithShrinkBudget(t *testing.T) {
 	t.Parallel()
 
 	rnd := rand.New(rand.NewPCG(11, 11))
-	arb := ArbitraryInt(rnd, 1000, 2000)
+	arb := arbitrary.Int(rnd, 1000, 2000)
 	prop := func(int) bool { return false } // every candidate fails
 
-	value, budgeted := findSimplestBadCaseWith(1, arb, prop, CheckOptions{
+	value, budgeted := ohsnap.FindSimplestBadCase(1, arb, prop, ohsnap.CheckOptions{
 		Budget:              2,
 		LogShrinkCandidates: true,
 		Logger:              t,
@@ -40,8 +43,8 @@ func TestCheckWithShrinkBudget(t *testing.T) {
 	}
 
 	rnd2 := rand.New(rand.NewPCG(11, 11))
-	arb2 := ArbitraryInt(rnd2, 1000, 2000)
-	_, unlimited := findSimplestBadCaseWith(1, arb2, prop, CheckOptions{
+	arb2 := arbitrary.Int(rnd2, 1000, 2000)
+	_, unlimited := ohsnap.FindSimplestBadCase(1, arb2, prop, ohsnap.CheckOptions{
 		LogShrinkCandidates: true,
 		Logger:              t,
 	})
@@ -54,19 +57,19 @@ func TestCheckWithPassingProperty(t *testing.T) {
 	t.Parallel()
 
 	rnd := rand.New(rand.NewPCG(12, 12))
-	arb := ArbitraryInt(rnd, 0, 100)
+	arb := arbitrary.Int(rnd, 0, 100)
 
-	CheckWith(t, 100, arb, func(x int) bool { return x >= 0 }, CheckOptions{Budget: 10})
+	ohsnap.CheckWith(t, 100, arb, func(x int) bool { return x >= 0 }, ohsnap.CheckOptions{Budget: 10})
 }
 
 func TestCheckWithProgressLogging(t *testing.T) {
 	t.Parallel()
 
 	rnd := rand.New(rand.NewPCG(21, 21))
-	arb := ArbitraryInt(rnd, 0, 100)
+	arb := arbitrary.Int(rnd, 0, 100)
 
 	log := &bufferLogger{}
-	CheckWith(t, 1200, arb, func(int) bool { return true }, CheckOptions{
+	ohsnap.CheckWith(t, 1200, arb, func(int) bool { return true }, ohsnap.CheckOptions{
 		ProgressEvery: 1000,
 		Logger:        log,
 	})
@@ -84,11 +87,11 @@ func TestCheckWithShrinkStepLogging(t *testing.T) {
 	t.Parallel()
 
 	rnd := rand.New(rand.NewPCG(22, 22))
-	arb := ArbitraryInt(rnd, 1000, 1000000)
+	arb := arbitrary.Int(rnd, 1000, 1000000)
 	prop := func(int) bool { return false } // every candidate fails
 
 	log := &bufferLogger{}
-	value, shrunk := findSimplestBadCaseWith(10, arb, prop, CheckOptions{
+	value, shrunk := ohsnap.FindSimplestBadCase(10, arb, prop, ohsnap.CheckOptions{
 		LogShrinkSteps: true,
 		Logger:         log,
 	})
@@ -115,11 +118,11 @@ func TestCheckWithBudgetLogging(t *testing.T) {
 	t.Parallel()
 
 	rnd := rand.New(rand.NewPCG(23, 23))
-	arb := ArbitraryInt(rnd, 1000, 2000)
+	arb := arbitrary.Int(rnd, 1000, 2000)
 	prop := func(int) bool { return false } // every candidate fails
 
 	log := &bufferLogger{}
-	_, shrunk := findSimplestBadCaseWith(1, arb, prop, CheckOptions{
+	_, shrunk := ohsnap.FindSimplestBadCase(1, arb, prop, ohsnap.CheckOptions{
 		Budget: 2,
 		Logger: log,
 	})

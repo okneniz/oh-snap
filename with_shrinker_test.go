@@ -1,9 +1,11 @@
-package ohsnap
+package ohsnap_test
 
 import (
 	"math/rand/v2"
 	"testing"
 
+	ohsnap "github.com/okneniz/oh-snap"
+	"github.com/okneniz/oh-snap/arbitrary"
 	"github.com/okneniz/oh-snap/shrink"
 )
 
@@ -16,9 +18,9 @@ func TestWithShrinkerStaysInRange(t *testing.T) {
 	t.Run("default shrink leaves the range", func(t *testing.T) {
 		t.Parallel()
 
-		arb := ArbitraryInt(rnd, 100, 200)
+		arb := arbitrary.Int(rnd, 100, 200)
 
-		_, shrunk := findSimplestBadCaseWith(1000, arb, prop, traceShrinking(t))
+		_, shrunk := ohsnap.FindSimplestBadCase(1000, arb, prop, ohsnap.CheckOptions{LogShrinkCandidates: true, Logger: t})
 		if shrunk == nil {
 			t.Fatal("expected property to fail")
 		}
@@ -30,9 +32,9 @@ func TestWithShrinkerStaysInRange(t *testing.T) {
 	t.Run("halving to lower bound stays inside", func(t *testing.T) {
 		t.Parallel()
 
-		arb := WithShrinker(ArbitraryInt(rnd, 100, 200), shrink.Halving(100))
+		arb := ohsnap.WithShrinker(arbitrary.Int(rnd, 100, 200), shrink.Halving(100))
 
-		_, shrunk := findSimplestBadCaseWith(1000, arb, prop, traceShrinking(t))
+		_, shrunk := ohsnap.FindSimplestBadCase(1000, arb, prop, ohsnap.CheckOptions{LogShrinkCandidates: true, Logger: t})
 		if shrunk == nil {
 			t.Fatal("expected property to fail")
 		}
@@ -46,7 +48,7 @@ func TestWithShrinkerKeepsGenerate(t *testing.T) {
 	t.Parallel()
 
 	rnd := rand.New(rand.NewPCG(9, 9))
-	arb := WithShrinker(ArbitraryInt(rnd, 5, 10), shrink.NoShrink[int]())
+	arb := ohsnap.WithShrinker(arbitrary.Int(rnd, 5, 10), shrink.NoShrink[int]())
 
 	for i := 0; i < 100; i++ {
 		value := arb.Generate()

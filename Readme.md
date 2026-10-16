@@ -12,7 +12,7 @@ failures are obvious at a glance.
 ```go
 func TestDoubleReverseIsIdentity(t *testing.T) {
 	rnd := rand.New(rand.NewPCG(1, 2))
-	arb := ohsnap.ArbitrarySlice(rnd, ohsnap.ArbitraryInt(rnd, 0, 100), 0, 10)
+	arb := arbitrary.Slice(rnd, arbitrary.Int(rnd, 0, 100), 0, 10)
 
 	ohsnap.Check(t, 1000, arb, func(xs []int) bool {
 		dst := slices.Clone(xs)
@@ -31,9 +31,8 @@ go get github.com/okneniz/oh-snap
 
 ## Why OhSnap
 
-- **Lazy by design.** `Generate` returns an `iter.Seq` — an infinite stream
-  of random values. Pull one with `ohsnap.First`, or range over it and take
-  as many as you need.
+- **Simple by design.** `Generate` returns a new random value on every call,
+  driven by a `*rand.Rand` you seed yourself.
 - **Real shrinking.** Counterexamples are minimized automatically: numbers
   halve toward zero, strings peel characters, slices and maps shrink
   structurally.
@@ -50,12 +49,12 @@ go get github.com/okneniz/oh-snap
 ### Generators
 
 ```go
-ohsnap.ArbitraryInt(rnd, -100, 100)                    // all numeric types
-ohsnap.ArbitraryString(rnd, "abcdef", 1, 10)           // strings
-ohsnap.ArbitraryTime(rnd, from, to)                    // time.Time
-ohsnap.ArbitrarySlice(rnd, elem, 0, 10)                // []T
-ohsnap.ArbitraryMap(rnd, keys, values, 0, 10)          // map[K]V
-ohsnap.RuneFromTable(rnd, unicode.Letter)              // unicode tables
+arbitrary.Int(rnd, -100, 100)                          // all numeric types
+arbitrary.String(rnd, "abcdef", 1, 10)                 // strings
+arbitrary.Time(rnd, from, to)                          // time.Time
+arbitrary.Slice(rnd, elem, 0, 10)                      // []T
+arbitrary.Map(rnd, keys, values, 0, 10)                // map[K]V
+arbitrary.RuneFromTable(rnd, unicode.Letter)           // unicode tables
 ```
 
 Combinators build bigger generators from smaller ones:
@@ -76,7 +75,7 @@ biased  := ohsnap.Weighted(rnd, map[int]ohsnap.Arbitrary[int]{
 ```go
 // keep candidates inside [100, 200] and walk toward its lower bound:
 arb := ohsnap.WithShrinker(
-	ohsnap.ArbitraryInt(rnd, 100, 200),
+	arbitrary.Int(rnd, 100, 200),
 	shrink.Halving(100),
 )
 ```
@@ -129,9 +128,11 @@ ohsnap.Check(t, 1000, arb, func(v json.Value) bool {
 
 - [GoDoc: ohsnap](https://pkg.go.dev/github.com/okneniz/oh-snap) — package
   overview and runnable examples for every generator and combinator
+- [GoDoc: arbitrary](https://pkg.go.dev/github.com/okneniz/oh-snap/arbitrary) —
+  generators for primitives, strings, runes, time and containers
 - [GoDoc: shrink](https://pkg.go.dev/github.com/okneniz/oh-snap/shrink) —
   shrinking strategies
-- [GoDoc: json](https://pkg.go.dev/github.com/okneniz/oh-snap/json) —
+- [GoDoc: json](https://pkg.go.dev/github.com/okneniz/oh-snap/arbitrary/json) —
   arbitrary JSON documents
 
 External examples:
